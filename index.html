@@ -29,13 +29,13 @@
 
   <main class="max-w-md mx-auto px-4 mt-3 space-y-3">
 
-    <!-- エラー通知バナー（接続失敗時に表示） -->
+    <!-- エラー通知バナー（初期状態は完全非表示） -->
     <div id="errorBanner" class="hidden bg-rose-950/80 border border-rose-800 rounded-xl p-3 text-xs text-rose-300">
       <div class="font-bold flex items-center gap-1.5 mb-1">
         <span>⚠️</span> データの取得に失敗しました
       </div>
-      <p class="text-[11px] text-rose-300/80 leading-relaxed">
-        GASの初回権限許可（承認）が完了しているか、デプロイ設定が「アクセスできるユーザー: 全員」になっているかご確認ください。
+      <p class="text-[11px] text-rose-300/80 leading-relaxed" id="errorMessageText">
+        通信を確認してください。
       </p>
     </div>
 
@@ -53,8 +53,8 @@
           <div id="valCommonAccount" class="text-base font-bold text-emerald-400 mt-0.5">¥---,---</div>
         </div>
         <div class="bg-slate-800/60 rounded-xl p-2.5">
-          <div class="text-slate-400 text-[11px]">現金合計</div>
-          <div id="valTotalCash" class="text-base font-bold text-slate-200 mt-0.5">¥---,---</div>
+          <div class="text-slate-400 text-[11px]">SBI新生銀行</div>
+          <div id="valSbiAccount" class="text-base font-bold text-slate-200 mt-0.5">¥---,---</div>
         </div>
       </div>
 
@@ -145,29 +145,30 @@
           </div>
         </div>
 
-        <!-- 費目（Item）チップ選択 -->
+        <!-- 費目（Item / D列）チップ選択 -->
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">費目 (Item)</label>
           <div class="grid grid-cols-3 gap-1.5" id="itemChips">
             <button type="button" onclick="setItem('食材費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300">🛒 食材費</button>
             <button type="button" onclick="setItem('日用品')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🧻 日用品</button>
-            <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン</button>
+            <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン代</button>
             <button type="button" onclick="setItem('光熱費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">💡 光熱費</button>
-            <button type="button" onclick="setItem('特別な支出')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🎁 特別な支出</button>
-            <button type="button" onclick="setItem('その他')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📦 その他</button>
+            <button type="button" onclick="setItem('ネット代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📶 ネット代</button>
+            <button type="button" onclick="setItem('家賃')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🏠 家賃</button>
           </div>
           <input type="hidden" id="inputItem" value="食材費">
-          <input type="hidden" id="inputCategory" value="支出・変動費">
         </div>
 
-        <!-- 支払者 / メモ -->
+        <!-- 支払区分（Category / C列） ＆ メモ -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">支払・担当</label>
-            <select id="inputPayer" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-              <option value="おぐら">おぐら</option>
-              <option value="もんま">もんま</option>
-              <option value="共通">共通</option>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">支払区分 (Category)</label>
+            <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="支出・共通">支出・共通</option>
+              <option value="おぐら立替">おぐら立替</option>
+              <option value="もんま立替">もんま立替</option>
+              <option value="支出・もんま">支出・もんま</option>
+              <option value="支出・SBI新生銀行">支出・SBI新生銀行</option>
             </select>
           </div>
           <div>
@@ -199,22 +200,26 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec";
 
-    function initPayer() {
-      const savedPayer = localStorage.getItem("household_kakeibo_payer") || "おぐら";
-      document.getElementById("inputPayer").value = savedPayer;
-      
-      document.getElementById("inputPayer").addEventListener("change", (e) => {
-        localStorage.setItem("household_kakeibo_payer", e.target.value);
-      });
+    // 安全にテキストを設定するヘルパー
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function initCategory() {
+      const savedCat = localStorage.getItem("household_kakeibo_category") || "支出・共通";
+      const selectElem = document.getElementById("inputCategory");
+      if (selectElem) {
+        selectElem.value = savedCat;
+        selectElem.addEventListener("change", (e) => {
+          localStorage.setItem("household_kakeibo_category", e.target.value);
+        });
+      }
     }
 
     function setItem(item) {
-      document.getElementById("inputItem").value = item;
-      if (item === "特別な支出") {
-        document.getElementById("inputCategory").value = "支出・特別費";
-      } else {
-        document.getElementById("inputCategory").value = "支出・変動費";
-      }
+      const inputItem = document.getElementById("inputItem");
+      if (inputItem) inputItem.value = item;
 
       document.querySelectorAll(".item-chip").forEach(chip => {
         if (chip.textContent.includes(item)) {
@@ -228,28 +233,32 @@
     async function fetchSummary() {
       const refreshBtn = document.getElementById("btnRefresh");
       const errorBanner = document.getElementById("errorBanner");
-      refreshBtn.classList.add("opacity-50", "pointer-events-none");
+      if (refreshBtn) refreshBtn.classList.add("opacity-50", "pointer-events-none");
 
       try {
         const res = await fetch(GAS_URL);
         const json = await res.json();
-        if (json.status === "success") {
-          errorBanner.classList.add("hidden");
+        if (json.status === "success" && json.data) {
+          if (errorBanner) errorBanner.classList.add("hidden");
           updateUI(json.data);
         } else {
-          console.error("エラー:", json.message);
-          errorBanner.classList.remove("hidden");
+          throw new Error(json.message || "データ形式が無効です");
         }
       } catch (err) {
         console.error("取得失敗:", err);
-        errorBanner.classList.remove("hidden");
+        if (errorBanner) {
+          errorBanner.classList.remove("hidden");
+          setText("errorMessageText", err.message || "通信エラーが発生しました");
+        }
       } finally {
-        refreshBtn.classList.remove("opacity-50", "pointer-events-none");
+        if (refreshBtn) refreshBtn.classList.remove("opacity-50", "pointer-events-none");
       }
     }
 
-    function updateProgressBar(barElem, percent) {
-      barElem.style.width = `${Math.min(100, percent)}%`;
+    function updateProgressBar(barId, percent) {
+      const barElem = document.getElementById(barId);
+      if (!barElem) return;
+      barElem.style.width = `${Math.min(100, Math.max(0, percent))}%`;
       if (percent >= 100) {
         barElem.className = "h-full bg-rose-500 rounded-full transition-all duration-500";
       } else if (percent >= 80) {
@@ -260,75 +269,88 @@
     }
 
     function updateUI(data) {
-      document.getElementById("labelMonth").textContent = data.sheetName || "今月";
-      
-      // 口座 & カード
-      document.getElementById("valCommonAccount").textContent = `¥${data.accounts.common.toLocaleString()}`;
-      document.getElementById("valTotalCash").textContent = `¥${data.accounts.totalCash.toLocaleString()}`;
-      document.getElementById("valNextCard").textContent = data.accounts.nextCard;
-      document.getElementById("valPrevCard").textContent = data.accounts.prevCard;
+      try {
+        setText("labelMonth", data.sheetName || "今月");
+        
+        // 口座 & カード
+        if (data.accounts) {
+          setText("valCommonAccount", `¥${Number(data.accounts.common || 0).toLocaleString()}`);
+          setText("valSbiAccount", `¥${Number(data.accounts.sbi || 0).toLocaleString()}`);
+          setText("valNextCard", data.accounts.nextCard || "¥0");
+          setText("valPrevCard", data.accounts.prevCard || "¥0");
+        }
 
-      // 食材費
-      const foodRem = data.food.remaining;
-      const foodRemElem = document.getElementById("valFoodRemaining");
-      foodRemElem.textContent = `¥${foodRem.toLocaleString()}`;
-      foodRemElem.className = foodRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-sky-400 ml-1";
-      document.getElementById("valFoodSpent").textContent = `¥${data.food.spent.toLocaleString()}`;
-      document.getElementById("valFoodBudget").textContent = `¥${data.food.budget.toLocaleString()}`;
-      document.getElementById("valFoodPercent").textContent = `${data.food.percent}%`;
-      updateProgressBar(document.getElementById("foodBar"), data.food.percent);
+        // 食材費
+        if (data.food) {
+          const foodRem = data.food.remaining || 0;
+          const foodRemElem = document.getElementById("valFoodRemaining");
+          if (foodRemElem) {
+            foodRemElem.textContent = `¥${foodRem.toLocaleString()}`;
+            foodRemElem.className = foodRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-sky-400 ml-1";
+          }
+          setText("valFoodSpent", `¥${Number(data.food.spent || 0).toLocaleString()}`);
+          setText("valFoodBudget", `¥${Number(data.food.budget || 0).toLocaleString()}`);
+          setText("valFoodPercent", `${data.food.percent || 0}%`);
+          updateProgressBar("foodBar", data.food.percent || 0);
+        }
 
-      // 日用品
-      const dailyRem = data.dailyGoods.remaining;
-      const dailyRemElem = document.getElementById("valDailyRemaining");
-      dailyRemElem.textContent = `¥${dailyRem.toLocaleString()}`;
-      dailyRemElem.className = dailyRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-emerald-400 ml-1";
-      document.getElementById("valDailySpent").textContent = `¥${data.dailyGoods.spent.toLocaleString()}`;
-      document.getElementById("valDailyBudget").textContent = `¥${data.dailyGoods.budget.toLocaleString()}`;
-      document.getElementById("valDailyPercent").textContent = `${data.dailyGoods.percent}%`;
-      updateProgressBar(document.getElementById("dailyBar"), data.dailyGoods.percent);
+        // 日用品
+        if (data.dailyGoods) {
+          const dailyRem = data.dailyGoods.remaining || 0;
+          const dailyRemElem = document.getElementById("valDailyRemaining");
+          if (dailyRemElem) {
+            dailyRemElem.textContent = `¥${dailyRem.toLocaleString()}`;
+            dailyRemElem.className = dailyRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-emerald-400 ml-1";
+          }
+          setText("valDailySpent", `¥${Number(data.dailyGoods.spent || 0).toLocaleString()}`);
+          setText("valDailyBudget", `¥${Number(data.dailyGoods.budget || 0).toLocaleString()}`);
+          setText("valDailyPercent", `${data.dailyGoods.percent || 0}%`);
+          updateProgressBar("dailyBar", data.dailyGoods.percent || 0);
+        }
 
-      // 変動費全体
-      document.getElementById("valTotalRemaining").textContent = `¥${data.total.remaining.toLocaleString()}`;
-      document.getElementById("valDailyAllowance").textContent = `約 ¥${data.total.dailyAllowance.toLocaleString()} /日`;
-      document.getElementById("valRemainingDays").textContent = `(残${data.total.remainingDays}日)`;
+        // 変動費全体
+        if (data.total) {
+          setText("valTotalRemaining", `¥${Number(data.total.remaining || 0).toLocaleString()}`);
+          setText("valDailyAllowance", `約 ¥${Number(data.total.dailyAllowance || 0).toLocaleString()} /日`);
+          setText("valRemainingDays", `(残${data.total.remainingDays || 0}日)`);
+        }
 
-      // 履歴一覧
-      const logList = document.getElementById("logList");
-      if (!data.recentLogs || data.recentLogs.length === 0) {
-        logList.innerHTML = '<div class="text-center py-3 text-slate-500">まだ入力はありません</div>';
-        return;
+        // 履歴一覧
+        const logList = document.getElementById("logList");
+        if (logList) {
+          if (!data.recentLogs || data.recentLogs.length === 0) {
+            logList.innerHTML = '<div class="text-center py-3 text-slate-500">まだ入力はありません</div>';
+          } else {
+            logList.innerHTML = data.recentLogs.map(log => `
+              <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-slate-500 font-mono">${log.date}</span>
+                  <div>
+                    <span class="font-semibold text-slate-200">${log.item || '未分類'}</span>
+                    ${log.memo ? `<span class="text-slate-400 text-[11px] ml-1">(${log.memo})</span>` : ''}
+                  </div>
+                </div>
+                <div class="font-bold text-slate-100">¥${Number(log.amount || 0).toLocaleString()}</div>
+              </div>
+            `).join("");
+          }
+        }
+      } catch (e) {
+        console.error("updateUIエラー:", e);
       }
-
-      logList.innerHTML = data.recentLogs.map(log => `
-        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-slate-500 font-mono">${log.date}</span>
-            <div>
-              <span class="font-semibold text-slate-200">${log.item}</span>
-              ${log.memo ? `<span class="text-slate-400 text-[11px] ml-1">(${log.memo})</span>` : ''}
-            </div>
-          </div>
-          <div class="font-bold text-slate-100">¥${log.amount.toLocaleString()}</div>
-        </div>
-      `).join("");
     }
 
     async function submitExpense(e) {
       e.preventDefault();
       const amountInput = document.getElementById("inputAmount");
       const memoInput = document.getElementById("inputMemo");
-      const payerSelect = document.getElementById("inputPayer");
-      const amount = Number(amountInput.value);
+      const categorySelect = document.getElementById("inputCategory");
+      const itemInput = document.getElementById("inputItem");
+      const amount = Number(amountInput ? amountInput.value : 0);
 
       if (!amount || amount <= 0) {
         alert("金額を入力してください");
         return;
-      }
-
-      let memoFull = payerSelect.value;
-      if (memoInput.value.trim()) {
-        memoFull += " " + memoInput.value.trim();
       }
 
       const now = new Date();
@@ -338,15 +360,17 @@
 
       const payload = {
         date: `${yyyy}/${mm}/${dd}`,
-        category: document.getElementById("inputCategory").value,
-        item: document.getElementById("inputItem").value,
+        category: categorySelect ? categorySelect.value : "支出・共通",
+        item: itemInput ? itemInput.value : "食材費",
         amount: amount,
-        memo: memoFull
+        memo: memoInput ? memoInput.value.trim() : ""
       };
 
       const submitBtn = document.getElementById("btnSubmit");
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = "<span>送信中...</span>";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "<span>送信中...</span>";
+      }
 
       try {
         const res = await fetch(GAS_URL, {
@@ -355,8 +379,8 @@
         });
         const json = await res.json();
         if (json.status === "success") {
-          amountInput.value = "";
-          memoInput.value = "";
+          if (amountInput) amountInput.value = "";
+          if (memoInput) memoInput.value = "";
           updateUI(json.data);
         } else {
           alert("エラー: " + json.message);
@@ -364,13 +388,15 @@
       } catch (err) {
         alert("送信エラー: " + err.toString());
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = "<span>スプシに保存</span>";
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "<span>スプシに保存</span>";
+        }
       }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      initPayer();
+      initCategory();
       fetchSummary();
     });
   </script>
