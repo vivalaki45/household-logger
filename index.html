@@ -29,6 +29,16 @@
 
   <main class="max-w-md mx-auto px-4 mt-3 space-y-3">
 
+    <!-- エラー通知バナー（接続失敗時に表示） -->
+    <div id="errorBanner" class="hidden bg-rose-950/80 border border-rose-800 rounded-xl p-3 text-xs text-rose-300">
+      <div class="font-bold flex items-center gap-1.5 mb-1">
+        <span>⚠️</span> データの取得に失敗しました
+      </div>
+      <p class="text-[11px] text-rose-300/80 leading-relaxed">
+        GASの初回権限許可（承認）が完了しているか、デプロイ設定が「アクセスできるユーザー: 全員」になっているかご確認ください。
+      </p>
+    </div>
+
     <!-- 1. 口座残高 ＆ カード使用額カード -->
     <section class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2.5">
       <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-1.5">
@@ -64,7 +74,7 @@
       </div>
     </section>
 
-    <!-- 2. 食材費・日用品 分割予算メーター（カロリー風） -->
+    <!-- 2. 食材費・日用品 分割予算メーター -->
     <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3.5">
       
       <!-- 食材費メーター -->
@@ -155,7 +165,7 @@
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">支払・担当</label>
             <select id="inputPayer" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-              <option value="せき">せき</option>
+              <option value="おぐら">おぐら</option>
               <option value="もんま">もんま</option>
               <option value="共通">共通</option>
             </select>
@@ -187,15 +197,12 @@
   </main>
 
   <script>
-    // 組み込み済み GAS WebアプリURL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec";
 
-    // 担当者の初期設定・記憶
     function initPayer() {
-      const savedPayer = localStorage.getItem("household_kakeibo_payer");
-      if (savedPayer) {
-        document.getElementById("inputPayer").value = savedPayer;
-      }
+      const savedPayer = localStorage.getItem("household_kakeibo_payer") || "おぐら";
+      document.getElementById("inputPayer").value = savedPayer;
+      
       document.getElementById("inputPayer").addEventListener("change", (e) => {
         localStorage.setItem("household_kakeibo_payer", e.target.value);
       });
@@ -220,18 +227,22 @@
 
     async function fetchSummary() {
       const refreshBtn = document.getElementById("btnRefresh");
+      const errorBanner = document.getElementById("errorBanner");
       refreshBtn.classList.add("opacity-50", "pointer-events-none");
 
       try {
         const res = await fetch(GAS_URL);
         const json = await res.json();
         if (json.status === "success") {
+          errorBanner.classList.add("hidden");
           updateUI(json.data);
         } else {
           console.error("エラー:", json.message);
+          errorBanner.classList.remove("hidden");
         }
       } catch (err) {
         console.error("取得失敗:", err);
+        errorBanner.classList.remove("hidden");
       } finally {
         refreshBtn.classList.remove("opacity-50", "pointer-events-none");
       }
