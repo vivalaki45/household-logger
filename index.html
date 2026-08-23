@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>共通家計簿 | Household Log</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    button, input, select { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 font-sans antialiased">
+
+  <!-- ヘッダー -->
+  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-2.5">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Household Log</p>
+        <h1 class="text-base font-bold text-white flex items-center gap-1.5">
+          <span>💳</span> 共通家計簿
+          <span id="labelMonth" class="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">読込中...</span>
+        </h1>
+      </div>
+      <button id="btnRefresh" onclick="fetchSummary()" class="p-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-slate-300 text-xs flex items-center gap-1">
+        🔄 <span>更新</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 mt-3 space-y-3">
+
+    <!-- 1. 口座残高 ＆ カード使用額カード -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2.5">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-1.5">
+        <span class="flex items-center gap-1">🏦 口座・カード残高</span>
+        <span class="text-[10px] text-slate-500 font-normal">スプシ連動</span>
+      </div>
+      
+      <!-- 口座 -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-slate-800/60 rounded-xl p-2.5">
+          <div class="text-slate-400 text-[11px]">共通口座</div>
+          <div id="valCommonAccount" class="text-base font-bold text-emerald-400 mt-0.5">¥---,---</div>
+        </div>
+        <div class="bg-slate-800/60 rounded-xl p-2.5">
+          <div class="text-slate-400 text-[11px]">現金合計</div>
+          <div id="valTotalCash" class="text-base font-bold text-slate-200 mt-0.5">¥---,---</div>
+        </div>
+      </div>
+
+      <!-- カード -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-slate-800/60 rounded-xl p-2.5 border border-sky-500/20">
+          <div class="text-slate-400 text-[11px] flex items-center justify-between">
+            <span>来月カード</span>
+            <span class="text-[10px] text-sky-400 font-mono">今月利用</span>
+          </div>
+          <div id="valNextCard" class="text-sm font-bold text-sky-300 mt-0.5">¥---</div>
+        </div>
+        <div class="bg-slate-800/60 rounded-xl p-2.5">
+          <div class="text-slate-400 text-[11px]">先月カード</div>
+          <div id="valPrevCard" class="text-sm font-bold text-slate-300 mt-0.5">¥---</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 食材費・日用品 分割予算メーター（カロリー風） -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3.5">
+      
+      <!-- 食材費メーター -->
+      <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-800">
+        <div class="flex justify-between items-baseline mb-1">
+          <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+            <span>🛒</span> 食材費
+          </span>
+          <div class="text-right">
+            <span class="text-[11px] text-slate-400">あと</span>
+            <span id="valFoodRemaining" class="text-lg font-extrabold text-sky-400 ml-1">¥---</span>
+          </div>
+        </div>
+        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div id="foodBar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+          <span>利用: <strong id="valFoodSpent" class="text-slate-200">¥0</strong></span>
+          <span>予算: <strong id="valFoodBudget" class="text-slate-200">¥30,000</strong> (<span id="valFoodPercent">0%</span>)</span>
+        </div>
+      </div>
+
+      <!-- 日用品メーター -->
+      <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-800">
+        <div class="flex justify-between items-baseline mb-1">
+          <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+            <span>🧻</span> 日用品
+          </span>
+          <div class="text-right">
+            <span class="text-[11px] text-slate-400">あと</span>
+            <span id="valDailyRemaining" class="text-lg font-extrabold text-emerald-400 ml-1">¥---</span>
+          </div>
+        </div>
+        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div id="dailyBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+          <span>利用: <strong id="valDailySpent" class="text-slate-200">¥0</strong></span>
+          <span>予算: <strong id="valDailyBudget" class="text-slate-200">¥7,000</strong> (<span id="valDailyPercent">0%</span>)</span>
+        </div>
+      </div>
+
+      <!-- 変動費全体のサマリー -->
+      <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
+        <div>
+          <span class="text-slate-400">変動費 残高計:</span>
+          <strong id="valTotalRemaining" class="text-slate-200 ml-1">¥---</strong>
+        </div>
+        <div>
+          <span class="text-slate-400">1日の目安:</span>
+          <strong id="valDailyAllowance" class="text-sky-400 ml-1">約 ¥- /日</strong>
+          <span id="valRemainingDays" class="text-[10px] text-slate-500 ml-1">(残--日)</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 3. 支出入力フォーム -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+      <form id="expenseForm" onsubmit="submitExpense(event)" class="space-y-3">
+        
+        <!-- 金額入力 -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">金額 (円)</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">¥</span>
+            <input type="number" id="inputAmount" required inputmode="numeric" placeholder="1500" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-4 py-2.5 text-2xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition">
+          </div>
+        </div>
+
+        <!-- 費目（Item）チップ選択 -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">費目 (Item)</label>
+          <div class="grid grid-cols-3 gap-1.5" id="itemChips">
+            <button type="button" onclick="setItem('食材費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300">🛒 食材費</button>
+            <button type="button" onclick="setItem('日用品')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🧻 日用品</button>
+            <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン</button>
+            <button type="button" onclick="setItem('光熱費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">💡 光熱費</button>
+            <button type="button" onclick="setItem('特別な支出')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🎁 特別な支出</button>
+            <button type="button" onclick="setItem('その他')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📦 その他</button>
+          </div>
+          <input type="hidden" id="inputItem" value="食材費">
+          <input type="hidden" id="inputCategory" value="支出・変動費">
+        </div>
+
+        <!-- 支払者 / メモ -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">支払・担当</label>
+            <select id="inputPayer" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="せき">せき</option>
+              <option value="もんま">もんま</option>
+              <option value="共通">共通</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">メモ (店名など)</label>
+            <input type="text" id="inputMemo" placeholder="ベルクス等" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <!-- 保存ボタン -->
+        <button type="submit" id="btnSubmit" class="w-full py-3 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 active:scale-[0.99] font-bold text-white rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <span>スプシに保存</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- 4. 最近の明細 -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+        <span>最近の入力明細</span>
+        <span class="text-[10px] text-slate-500 font-normal">直近8件</span>
+      </h2>
+      <div id="logList" class="space-y-1.5 text-xs">
+        <div class="text-center py-3 text-slate-500">読み込み中...</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // 組み込み済み GAS WebアプリURL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec";
+
+    // 担当者の初期設定・記憶
+    function initPayer() {
+      const savedPayer = localStorage.getItem("household_kakeibo_payer");
+      if (savedPayer) {
+        document.getElementById("inputPayer").value = savedPayer;
+      }
+      document.getElementById("inputPayer").addEventListener("change", (e) => {
+        localStorage.setItem("household_kakeibo_payer", e.target.value);
+      });
+    }
+
+    function setItem(item) {
+      document.getElementById("inputItem").value = item;
+      if (item === "特別な支出") {
+        document.getElementById("inputCategory").value = "支出・特別費";
+      } else {
+        document.getElementById("inputCategory").value = "支出・変動費";
+      }
+
+      document.querySelectorAll(".item-chip").forEach(chip => {
+        if (chip.textContent.includes(item)) {
+          chip.className = "item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300";
+        } else {
+          chip.className = "item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300";
+        }
+      });
+    }
+
+    async function fetchSummary() {
+      const refreshBtn = document.getElementById("btnRefresh");
+      refreshBtn.classList.add("opacity-50", "pointer-events-none");
+
+      try {
+        const res = await fetch(GAS_URL);
+        const json = await res.json();
+        if (json.status === "success") {
+          updateUI(json.data);
+        } else {
+          console.error("エラー:", json.message);
+        }
+      } catch (err) {
+        console.error("取得失敗:", err);
+      } finally {
+        refreshBtn.classList.remove("opacity-50", "pointer-events-none");
+      }
+    }
+
+    function updateProgressBar(barElem, percent) {
+      barElem.style.width = `${Math.min(100, percent)}%`;
+      if (percent >= 100) {
+        barElem.className = "h-full bg-rose-500 rounded-full transition-all duration-500";
+      } else if (percent >= 80) {
+        barElem.className = "h-full bg-amber-400 rounded-full transition-all duration-500";
+      } else {
+        barElem.className = "h-full bg-sky-500 rounded-full transition-all duration-500";
+      }
+    }
+
+    function updateUI(data) {
+      document.getElementById("labelMonth").textContent = data.sheetName || "今月";
+      
+      // 口座 & カード
+      document.getElementById("valCommonAccount").textContent = `¥${data.accounts.common.toLocaleString()}`;
+      document.getElementById("valTotalCash").textContent = `¥${data.accounts.totalCash.toLocaleString()}`;
+      document.getElementById("valNextCard").textContent = data.accounts.nextCard;
+      document.getElementById("valPrevCard").textContent = data.accounts.prevCard;
+
+      // 食材費
+      const foodRem = data.food.remaining;
+      const foodRemElem = document.getElementById("valFoodRemaining");
+      foodRemElem.textContent = `¥${foodRem.toLocaleString()}`;
+      foodRemElem.className = foodRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-sky-400 ml-1";
+      document.getElementById("valFoodSpent").textContent = `¥${data.food.spent.toLocaleString()}`;
+      document.getElementById("valFoodBudget").textContent = `¥${data.food.budget.toLocaleString()}`;
+      document.getElementById("valFoodPercent").textContent = `${data.food.percent}%`;
+      updateProgressBar(document.getElementById("foodBar"), data.food.percent);
+
+      // 日用品
+      const dailyRem = data.dailyGoods.remaining;
+      const dailyRemElem = document.getElementById("valDailyRemaining");
+      dailyRemElem.textContent = `¥${dailyRem.toLocaleString()}`;
+      dailyRemElem.className = dailyRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-emerald-400 ml-1";
+      document.getElementById("valDailySpent").textContent = `¥${data.dailyGoods.spent.toLocaleString()}`;
+      document.getElementById("valDailyBudget").textContent = `¥${data.dailyGoods.budget.toLocaleString()}`;
+      document.getElementById("valDailyPercent").textContent = `${data.dailyGoods.percent}%`;
+      updateProgressBar(document.getElementById("dailyBar"), data.dailyGoods.percent);
+
+      // 変動費全体
+      document.getElementById("valTotalRemaining").textContent = `¥${data.total.remaining.toLocaleString()}`;
+      document.getElementById("valDailyAllowance").textContent = `約 ¥${data.total.dailyAllowance.toLocaleString()} /日`;
+      document.getElementById("valRemainingDays").textContent = `(残${data.total.remainingDays}日)`;
+
+      // 履歴一覧
+      const logList = document.getElementById("logList");
+      if (!data.recentLogs || data.recentLogs.length === 0) {
+        logList.innerHTML = '<div class="text-center py-3 text-slate-500">まだ入力はありません</div>';
+        return;
+      }
+
+      logList.innerHTML = data.recentLogs.map(log => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-slate-500 font-mono">${log.date}</span>
+            <div>
+              <span class="font-semibold text-slate-200">${log.item}</span>
+              ${log.memo ? `<span class="text-slate-400 text-[11px] ml-1">(${log.memo})</span>` : ''}
+            </div>
+          </div>
+          <div class="font-bold text-slate-100">¥${log.amount.toLocaleString()}</div>
+        </div>
+      `).join("");
+    }
+
+    async function submitExpense(e) {
+      e.preventDefault();
+      const amountInput = document.getElementById("inputAmount");
+      const memoInput = document.getElementById("inputMemo");
+      const payerSelect = document.getElementById("inputPayer");
+      const amount = Number(amountInput.value);
+
+      if (!amount || amount <= 0) {
+        alert("金額を入力してください");
+        return;
+      }
+
+      let memoFull = payerSelect.value;
+      if (memoInput.value.trim()) {
+        memoFull += " " + memoInput.value.trim();
+      }
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+
+      const payload = {
+        date: `${yyyy}/${mm}/${dd}`,
+        category: document.getElementById("inputCategory").value,
+        item: document.getElementById("inputItem").value,
+        amount: amount,
+        memo: memoFull
+      };
+
+      const submitBtn = document.getElementById("btnSubmit");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "<span>送信中...</span>";
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.status === "success") {
+          amountInput.value = "";
+          memoInput.value = "";
+          updateUI(json.data);
+        } else {
+          alert("エラー: " + json.message);
+        }
+      } catch (err) {
+        alert("送信エラー: " + err.toString());
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "<span>スプシに保存</span>";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initPayer();
+      fetchSummary();
+    });
+  </script>
+</body>
+</html>
