@@ -7,6 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     button, input, select { -webkit-tap-highlight-color: transparent; }
+    /* 横スクロールバーを非表示にしてアプリ感を出す */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-12 font-sans antialiased">
@@ -185,14 +188,20 @@
       </form>
     </section>
 
-    <!-- 4. 最近の明細 -->
+    <!-- 4. 最近の入力明細（横スワイプ・カルーセル形式） -->
     <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-        <span>最近の入力明細</span>
-        <span class="text-[10px] text-slate-500 font-normal">直近8件</span>
-      </h2>
-      <div id="logList" class="space-y-1.5 text-xs">
-        <div class="text-center py-3 text-slate-500">読み込み中...</div>
+      <div class="flex items-center justify-between mb-2.5">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🕒</span> 最近の入力明細
+        </h2>
+        <span class="text-[10px] text-slate-500 flex items-center gap-1">
+          <span>👉 横スワイプ</span>
+        </span>
+      </div>
+      
+      <!-- 横スクロールコンテナ -->
+      <div id="logList" class="flex gap-2.5 overflow-x-auto no-scrollbar scroll-smooth pb-1 pt-0.5">
+        <div class="text-center py-3 text-slate-500 text-xs w-full">読み込み中...</div>
       </div>
     </section>
 
@@ -317,23 +326,23 @@
           setText("valRemainingDays", `(残${data.total.remainingDays || 0}日)`);
         }
 
-        // 履歴一覧
+        // 履歴一覧（横スワイプ対応カード）
         const logList = document.getElementById("logList");
         if (logList) {
           if (!data.recentLogs || data.recentLogs.length === 0) {
-            logList.innerHTML = '<div class="text-center py-3 text-slate-500">まだ入力はありません</div>';
+            logList.innerHTML = '<div class="text-center py-3 text-slate-500 text-xs w-full">まだ入力はありません</div>';
           } else {
             logList.innerHTML = data.recentLogs.map(log => `
-              <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] text-slate-500 font-mono">${log.date}</span>
-                  <div>
-                    <span class="font-semibold text-slate-200">${log.item || '未分類'}</span>
-                    ${log.category ? `<span class="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300 ml-1">${log.category}</span>` : ''}
-                    ${log.memo ? `<span class="text-slate-400 text-[11px] ml-1">(${log.memo})</span>` : ''}
+              <div class="flex-shrink-0 w-36 bg-slate-800/60 border border-slate-700/60 rounded-xl p-2.5 flex flex-col justify-between hover:border-slate-600 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] text-slate-400 font-mono">${log.date}</span>
+                    ${log.category ? `<span class="text-[9px] px-1 py-0.2 rounded bg-slate-700 text-slate-300 font-medium truncate max-w-[60px]">${log.category}</span>` : '<span class="text-[9px] text-slate-500">カード</span>'}
                   </div>
+                  <div class="font-bold text-xs text-slate-100 truncate">${log.item || '未分類'}</div>
+                  ${log.memo ? `<div class="text-[10px] text-slate-400 truncate mt-0.5">${log.memo}</div>` : '<div class="text-[10px] text-slate-600 truncate mt-0.5">-</div>'}
                 </div>
-                <div class="font-bold text-slate-100">¥${Number(log.amount || 0).toLocaleString()}</div>
+                <div class="font-extrabold text-sm text-sky-400 mt-2 text-right">¥${Number(log.amount || 0).toLocaleString()}</div>
               </div>
             `).join("");
           }
