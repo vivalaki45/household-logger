@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     button, input, select { -webkit-tap-highlight-color: transparent; }
-    /* スクロールバー非表示 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -28,7 +27,7 @@
     </button>
   </header>
 
-  <!-- トースト通知（保存成功時） -->
+  <!-- トースト通知 -->
   <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-slate-950 px-4 py-2 rounded-full font-bold text-xs shadow-lg transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2">
     ✅ スプシに保存しました！
   </div>
@@ -39,85 +38,15 @@
     <p class="text-[11px] text-rose-300/80" id="errorMessageText">データの取得に失敗しました</p>
   </div>
 
-  <!-- メイン画面（カルーセルスワイパー） -->
+  <!-- メイン画面（2画面カルーセル） -->
   <div class="flex-1 overflow-hidden relative">
-    <div id="screensWrapper" class="flex h-full w-[300%] transition-transform duration-300 ease-out">
+    <div id="screensWrapper" class="flex h-full w-[200%] transition-transform duration-300 ease-out">
       
-      <!-- ================= 画面 1: 入力フォーム ================= -->
+      <!-- ================= 画面 1: ホーム（残予算 ＋ 入力） ================= -->
       <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
         <div class="max-w-md mx-auto space-y-3">
           
-          <!-- 残予算ミニステータス -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between shadow-sm">
-            <div>
-              <span class="text-[11px] text-slate-400">今月の変動費 残り</span>
-              <div id="valMiniRemaining" class="text-xl font-extrabold text-sky-400 tracking-tight">¥---,---</div>
-            </div>
-            <div class="text-right">
-              <span class="text-[11px] text-slate-400">1日の目安</span>
-              <div id="valMiniDaily" class="text-xs font-bold text-emerald-400">約 ¥- /日</div>
-            </div>
-          </div>
-
-          <!-- 入力フォームカード -->
-          <form id="expenseForm" onsubmit="submitExpense(event)" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-            
-            <!-- 金額入力 -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">金額 (円)</label>
-              <div class="relative">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">¥</span>
-                <input type="number" id="inputAmount" required inputmode="numeric" placeholder="1500" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-4 py-3 text-2xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition">
-              </div>
-            </div>
-
-            <!-- 費目（Item）チップ選択 -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">費目 (Item)</label>
-              <div class="grid grid-cols-3 gap-1.5" id="itemChips">
-                <button type="button" onclick="setItem('食材費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300">🛒 食材費</button>
-                <button type="button" onclick="setItem('日用品')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🧻 日用品</button>
-                <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン代</button>
-                <button type="button" onclick="setItem('光熱費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">💡 光熱費</button>
-                <button type="button" onclick="setItem('ネット代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📶 ネット代</button>
-                <button type="button" onclick="setItem('ローン')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🏦 ローン</button>
-              </div>
-              <input type="hidden" id="inputItem" value="食材費">
-            </div>
-
-            <!-- 支払区分（Category） ＆ メモ -->
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">支払区分 (Category)</label>
-                <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-                  <option value="">💳 カード払い (空白)</option>
-                  <option value="支出・共通">支出・共通</option>
-                  <option value="おぐら立替">おぐら立替</option>
-                  <option value="もんま立替">もんま立替</option>
-                  <option value="支出・もんま">支出・もんま</option>
-                  <option value="支出・SBI新生銀行">支出・SBI新生銀行</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">メモ (店名・担当など)</label>
-                <input type="text" id="inputMemo" placeholder="ベルクス、せき等" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500">
-              </div>
-            </div>
-
-            <!-- 送信ボタン -->
-            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 active:scale-[0.99] font-bold text-white rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-              <span>スプシに保存</span>
-            </button>
-          </form>
-
-        </div>
-      </section>
-
-      <!-- ================= 画面 2: 残予算ダッシュボード ================= -->
-      <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
-        <div class="max-w-md mx-auto space-y-3">
-
-          <!-- 口座残高 ＆ カード使用額カード -->
+          <!-- 1. 口座残高 ＆ カード使用額 -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2.5">
             <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-1.5">
               <span class="flex items-center gap-1">🏦 口座・カード残高</span>
@@ -150,7 +79,7 @@
             </div>
           </div>
 
-          <!-- 食材費・日用品 メーター -->
+          <!-- 2. 食材費・日用品 分割予算メーター -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3.5">
             
             <!-- 食材費メーター -->
@@ -208,16 +137,70 @@
 
           </div>
 
+          <!-- 3. 支出入力フォーム -->
+          <form id="expenseForm" onsubmit="submitExpense(event)" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span>✍️</span> 支出を記録
+            </h2>
+
+            <!-- 金額入力 -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">金額 (円)</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">¥</span>
+                <input type="number" id="inputAmount" required inputmode="numeric" placeholder="1500" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-4 py-3 text-2xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition">
+              </div>
+            </div>
+
+            <!-- 費目（Item）チップ選択 -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">費目 (Item)</label>
+              <div class="grid grid-cols-3 gap-1.5" id="itemChips">
+                <button type="button" onclick="setItem('食材費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300">🛒 食材費</button>
+                <button type="button" onclick="setItem('日用品')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🧻 日用品</button>
+                <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン代</button>
+                <button type="button" onclick="setItem('光熱費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">💡 光熱費</button>
+                <button type="button" onclick="setItem('ネット代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📶 ネット代</button>
+                <button type="button" onclick="setItem('ローン')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🏦 ローン</button>
+              </div>
+              <input type="hidden" id="inputItem" value="食材費">
+            </div>
+
+            <!-- 支払区分（Category） ＆ メモ -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">支払区分 (Category)</label>
+                <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                  <option value="">💳 カード払い (空白)</option>
+                  <option value="支出・共通">支出・共通</option>
+                  <option value="おぐら立替">おぐら立替</option>
+                  <option value="もんま立替">もんま立替</option>
+                  <option value="支出・もんま">支出・もんま</option>
+                  <option value="支出・SBI新生銀行">支出・SBI新生銀行</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">メモ (店名・担当など)</label>
+                <input type="text" id="inputMemo" placeholder="ベルクス、せき等" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500">
+              </div>
+            </div>
+
+            <!-- 保存ボタン -->
+            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 active:scale-[0.99] font-bold text-white rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+              <span>スプシに保存</span>
+            </button>
+          </form>
+
         </div>
       </section>
 
-      <!-- ================= 画面 3: 履歴一覧 ================= -->
+      <!-- ================= 画面 2: 履歴一覧 ================= -->
       <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
         <div class="max-w-md mx-auto space-y-3">
           
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
             <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
-              <span>最近の入力明細 (直近ログ)</span>
+              <span>最近の入力明細</span>
               <span class="text-[10px] text-slate-500 font-normal">新しい順</span>
             </h2>
             <div id="logList" class="space-y-2 text-xs">
@@ -231,23 +214,18 @@
     </div>
   </div>
 
-  <!-- 下部固定タブバー -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur border-t border-slate-800 py-1.5 px-6">
-    <div class="max-w-md mx-auto grid grid-cols-3 gap-2">
+  <!-- 下部固定タブバー（2画面） -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur border-t border-slate-800 py-2 px-12">
+    <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
       
-      <button onclick="switchTab(0)" id="tabBtn0" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-sky-400 transition">
-        <span class="text-lg">✍️</span>
-        <span class="text-[10px] font-bold mt-0.5">入力</span>
+      <button onclick="switchTab(0)" id="tabBtn0" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-sky-400 font-bold transition scale-105">
+        <span class="text-xl">🏠</span>
+        <span class="text-[11px] font-bold mt-0.5">ホーム</span>
       </button>
 
       <button onclick="switchTab(1)" id="tabBtn1" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-slate-500 hover:text-slate-300 transition">
-        <span class="text-lg">📊</span>
-        <span class="text-[10px] font-bold mt-0.5">残予算</span>
-      </button>
-
-      <button onclick="switchTab(2)" id="tabBtn2" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-slate-500 hover:text-slate-300 transition">
-        <span class="text-lg">📋</span>
-        <span class="text-[10px] font-bold mt-0.5">履歴</span>
+        <span class="text-xl">📋</span>
+        <span class="text-[11px] font-bold mt-0.5">履歴</span>
       </button>
 
     </div>
@@ -263,16 +241,15 @@
       if (el) el.textContent = text;
     }
 
-    // タブ切り替え関数
+    // タブ切り替え（0: ホーム, 1: 履歴）
     function switchTab(index) {
       currentTabIndex = index;
       const wrapper = document.getElementById("screensWrapper");
       if (wrapper) {
-        wrapper.style.transform = `translateX(-${index * (100 / 3)}%)`;
+        wrapper.style.transform = `translateX(-${index * 50}%)`;
       }
 
-      // タブボタンのアクティブ状態更新
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         const btn = document.getElementById(`tabBtn${i}`);
         if (btn) {
           if (i === index) {
@@ -284,7 +261,7 @@
       }
     }
 
-    // スワイプ操作対応
+    // スワイプ対応
     let touchStartX = 0;
     let touchEndX = 0;
     const wrapper = document.getElementById("screensWrapper");
@@ -301,10 +278,10 @@
     function handleSwipe() {
       const diffX = touchStartX - touchEndX;
       if (Math.abs(diffX) > 60) {
-        if (diffX > 0 && currentTabIndex < 2) {
-          switchTab(currentTabIndex + 1); // 左スワイプ -> 次の画面
+        if (diffX > 0 && currentTabIndex < 1) {
+          switchTab(1);
         } else if (diffX < 0 && currentTabIndex > 0) {
-          switchTab(currentTabIndex - 1); // 右スワイプ -> 前の画面
+          switchTab(0);
         }
       }
     }
@@ -415,18 +392,12 @@
 
         // 変動費全体
         if (data.total) {
-          const totalRem = `¥${Number(data.total.remaining || 0).toLocaleString()}`;
-          setText("valTotalRemaining", totalRem);
-          setText("valMiniRemaining", totalRem);
-          
-          const dailyText = `約 ¥${Number(data.total.dailyAllowance || 0).toLocaleString()} /日`;
-          setText("valDailyAllowance", dailyText);
-          setText("valMiniDaily", dailyText);
-
+          setText("valTotalRemaining", `¥${Number(data.total.remaining || 0).toLocaleString()}`);
+          setText("valDailyAllowance", `約 ¥${Number(data.total.dailyAllowance || 0).toLocaleString()} /日`);
           setText("valRemainingDays", `(残${data.total.remainingDays || 0}日)`);
         }
 
-        // 履歴一覧（縦長リスト形式）
+        // 履歴一覧
         const logList = document.getElementById("logList");
         if (logList) {
           if (!data.recentLogs || data.recentLogs.length === 0) {
@@ -507,7 +478,7 @@
           if (amountInput) amountInput.value = "";
           if (memoInput) memoInput.value = "";
           updateUI(json.data);
-          showToast(); // 保存完了トースト
+          showToast();
         } else {
           alert("エラー: " + json.message);
         }
