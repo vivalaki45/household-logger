@@ -42,39 +42,53 @@
   <div class="flex-1 overflow-hidden relative">
     <div id="screensWrapper" class="flex h-full w-[200%] transition-transform duration-300 ease-out">
       
-      <!-- ================= 画面 1: ホーム（残予算 ＋ 入力） ================= -->
+      <!-- ================= 画面 1: ホーム（残予算 ＋ 口座 ＋ 入力） ================= -->
       <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
         <div class="max-w-md mx-auto space-y-3">
           
-          <!-- 1. 口座残高 ＆ カード使用額 -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2.5">
+          <!-- 1. 口座・カード・立替・資産運用カード（2列×3行） -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2">
             <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-1.5">
-              <span class="flex items-center gap-1">🏦 口座・カード残高</span>
+              <span class="flex items-center gap-1">🏦 口座・カード・立替</span>
               <span class="text-[10px] text-slate-500 font-normal">スプシ連動</span>
             </div>
             
+            <!-- 口座 2つ -->
             <div class="grid grid-cols-2 gap-2 text-xs">
               <div class="bg-slate-800/60 rounded-xl p-2.5">
                 <div class="text-slate-400 text-[11px]">共通口座</div>
-                <div id="valCommonAccount" class="text-base font-bold text-emerald-400 mt-0.5">¥---,---</div>
+                <div id="valCommonAccount" class="text-sm font-bold text-emerald-400 mt-0.5">¥---,---</div>
               </div>
               <div class="bg-slate-800/60 rounded-xl p-2.5">
                 <div class="text-slate-400 text-[11px]">SBI新生銀行</div>
-                <div id="valSbiAccount" class="text-base font-bold text-slate-200 mt-0.5">¥---,---</div>
+                <div id="valSbiAccount" class="text-sm font-bold text-slate-200 mt-0.5">¥---,---</div>
               </div>
             </div>
 
+            <!-- 資産運用 ＆ カード（今月利用） -->
             <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-800/60 rounded-xl p-2.5">
+                <div class="text-slate-400 text-[11px]">📈 資産運用</div>
+                <div id="valAssetAccount" class="text-sm font-bold text-amber-300 mt-0.5">¥---,---</div>
+              </div>
               <div class="bg-slate-800/60 rounded-xl p-2.5 border border-sky-500/20">
                 <div class="text-slate-400 text-[11px] flex items-center justify-between">
                   <span>来月カード</span>
-                  <span class="text-[10px] text-sky-400 font-mono">今月利用</span>
+                  <span class="text-[9px] text-sky-400 font-mono">今月利用</span>
                 </div>
                 <div id="valNextCard" class="text-sm font-bold text-sky-300 mt-0.5">¥---</div>
               </div>
+            </div>
+
+            <!-- 立替 2つ -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
               <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">先月カード</div>
-                <div id="valPrevCard" class="text-sm font-bold text-slate-300 mt-0.5">¥---</div>
+                <div class="text-slate-400 text-[11px]">🙋‍♂️ おぐら立替</div>
+                <div id="valOguraTatekae" class="text-sm font-bold text-indigo-300 mt-0.5">¥---</div>
+              </div>
+              <div class="bg-slate-800/60 rounded-xl p-2.5">
+                <div class="text-slate-400 text-[11px]">🙋‍♀️ もんま立替</div>
+                <div id="valMonmaTatekae" class="text-sm font-bold text-pink-300 mt-0.5">¥---</div>
               </div>
             </div>
           </div>
@@ -214,7 +228,7 @@
     </div>
   </div>
 
-  <!-- 下部固定タブバー（2画面） -->
+  <!-- 下部固定タブバー -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur border-t border-slate-800 py-2 px-12">
     <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
       
@@ -241,7 +255,6 @@
       if (el) el.textContent = text;
     }
 
-    // タブ切り替え（0: ホーム, 1: 履歴）
     function switchTab(index) {
       currentTabIndex = index;
       const wrapper = document.getElementById("screensWrapper");
@@ -261,7 +274,6 @@
       }
     }
 
-    // スワイプ対応
     let touchStartX = 0;
     let touchEndX = 0;
     const wrapper = document.getElementById("screensWrapper");
@@ -354,12 +366,14 @@
       try {
         setText("labelMonth", data.sheetName || "今月");
         
-        // 口座 & カード
+        // 口座・資産・カード・立替
         if (data.accounts) {
           setText("valCommonAccount", `¥${Number(data.accounts.common || 0).toLocaleString()}`);
           setText("valSbiAccount", `¥${Number(data.accounts.sbi || 0).toLocaleString()}`);
+          setText("valAssetAccount", `¥${Number(data.accounts.asset || 0).toLocaleString()}`);
           setText("valNextCard", data.accounts.nextCard || "¥0");
-          setText("valPrevCard", data.accounts.prevCard || "¥0");
+          setText("valOguraTatekae", `¥${Number(data.accounts.ogura || 0).toLocaleString()}`);
+          setText("valMonmaTatekae", `¥${Number(data.accounts.monma || 0).toLocaleString()}`);
         }
 
         // 食材費
