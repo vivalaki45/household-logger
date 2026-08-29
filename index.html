@@ -1,1402 +1,1355 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <title>Money Log House</title>
-
-  <style>
-    :root {
-      --bg: #f5f7f8;
-      --card: #ffffff;
-      --text: #1f2933;
-      --sub: #6b7280;
-      --border: #d9dee3;
-      --green: #16a34a;
-      --red: #d93025;
-      --blue: #1a73e8;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 16px 16px 96px;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
-
-    button,
-    input,
-    textarea {
-      font: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .header {
-      margin-bottom: 16px;
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    .meta {
-      color: var(--sub);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .card {
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid #e6e5e3;
-      border-radius: 16px;
-      box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.05),
-        0 4px 12px rgba(0, 0, 0, 0.04);
-    }
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .status {
-      display: none;
-      margin-bottom: 14px;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .status.show {
-      display: block;
-    }
-
-    .status.info {
-      color: var(--blue);
-      background: #e5f2fc;
-    }
-
-    .status.success {
-      color: #267a4c;
-      background: #e8f1ec;
-    }
-
-    .status.error {
-      color: var(--red);
-      background: #fce9e7;
-    }
-
-    .loading {
-      padding: 24px;
-      color: var(--sub);
-      text-align: center;
-    }
-
-    .field-label {
-      display: block;
-      margin: 16px 0 8px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .dropdown {
-      position: relative;
-    }
-
-    .dropdown-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      min-height: 50px;
-      padding: 0 14px;
-      color: var(--text);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .dropdown-toggle.open {
-      border-color: var(--green);
-      box-shadow:
-        0 0 0 3px rgba(22, 163, 74, 0.13);
-    }
-
-    .dropdown-arrow {
-      color: var(--sub);
-      font-size: 15px;
-      transition: transform 0.15s;
-    }
-
-    .dropdown-toggle.open .dropdown-arrow {
-      transform: rotate(180deg);
-    }
-
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      left: 0;
-      z-index: 30;
-      max-height: 280px;
-      overflow-y: auto;
-      padding: 8px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow:
-        0 14px 32px rgba(0, 0, 0, 0.16);
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .dropdown-menu.open {
-      display: block;
-    }
-
-    .dropdown-option {
-      display: block;
-      width: 100%;
-      min-height: 46px;
-      padding: 11px 12px;
-      color: var(--text);
-      background: #ffffff;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .dropdown-option + .dropdown-option {
-      margin-top: 2px;
-    }
-
-    .dropdown-option:hover,
-    .dropdown-option:focus-visible {
-      background: #f0fdf4;
-      outline: none;
-    }
-
-    .dropdown-option.selected {
-      color: #166534;
-      background: #dcfce7;
-      font-weight: 800;
-    }
-
-    .empty-options {
-      padding: 12px;
-      color: var(--sub);
-      font-size: 14px;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 14px 12px;
-      color: var(--text);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      font-size: 18px;
-      outline: none;
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: var(--green);
-      box-shadow:
-        0 0 0 3px rgba(22, 163, 74, 0.13);
-    }
-
-    textarea {
-      min-height: 88px;
-      resize: vertical;
-    }
-
-    .amount-box {
-      position: relative;
-    }
-
-    .yen {
-      position: absolute;
-      top: 50%;
-      left: 14px;
-      color: var(--sub);
-      transform: translateY(-50%);
-    }
-
-    #amount {
-      padding-left: 36px;
-      font-weight: 800;
-    }
-
-    .submit {
-      width: 100%;
-      min-height: 56px;
-      margin-top: 20px;
-      color: #ffffff;
-      background:
-        linear-gradient(
-          135deg,
-          #16a34a,
-          #22c55e 45%,
-          #14b8a6
-        );
-      border: 0;
-      border-radius: 16px;
-      font-size: 20px;
-      font-weight: 900;
-      box-shadow:
-        0 14px 28px rgba(34, 197, 94, 0.25);
-      cursor: pointer;
-    }
-
-    .submit:active {
-      transform: translateY(1px);
-    }
-
-    .submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .last {
-      display: none;
-      margin-top: 12px;
-      color: var(--sub);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .last.show {
-      display: block;
-    }
-
-    .summary-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .summary-item {
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
-
-    .summary-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    .summary-label {
-      color: var(--sub);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .summary-right {
-      text-align: right;
-    }
-
-    .summary-budget {
-      color: var(--sub);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .summary-balance {
-      margin-top: 4px;
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .summary-balance.plus {
-      color: var(--blue);
-    }
-
-    .summary-balance.minus {
-      color: var(--red);
-    }
-
-    .summary-value {
-      font-size: 34px;
-      font-weight: 760;
-      letter-spacing: -0.025em;
-    }
-
-    .tabs {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 20;
-      padding:
-        10px
-        16px
-        calc(10px + env(safe-area-inset-bottom));
-      background: rgba(245, 247, 248, 0.94);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-    }
-
-    .tab-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 5px;
-      background: #e9edf2;
-      border-radius: 16px;
-    }
-
-    .tab-button {
-      min-height: 44px;
-      color: var(--sub);
-      background: transparent;
-      border: 0;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .tab-button.active {
-      color: var(--text);
-      background: #ffffff;
-      box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    @media (max-width: 520px) {
-      body {
-        padding:
-          12px
-          12px
-          calc(92px + env(safe-area-inset-bottom));
-      }
-
-      h1 {
-        font-size: 28px;
-      }
-
-      .card {
-        padding: 16px;
-      }
-
-      input,
-      textarea {
-        font-size: 16px;
-      }
-
-      .dropdown-menu {
-        max-height: 260px;
-      }
-
-      .summary-value {
-        font-size: 30px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<title>Money Log House</title>
+
+<style>
+:root {
+  --bg: #f5f7f8;
+  --card: #ffffff;
+  --text: #1f2933;
+  --sub: #6b7280;
+  --border: #d9dee3;
+  --green: #16a34a;
+  --red: #d93025;
+  --blue: #1a73e8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px 16px 96px;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.app {
+  max-width: 480px;
+  margin: auto;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.meta {
+  color: var(--sub);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.card {
+  margin-bottom: 14px;
+  padding: 18px;
+  background: var(--card);
+  border: 1px solid #e6e5e3;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.05),
+    0 4px 12px rgba(0,0,0,.04);
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.status {
+  display: none;
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.status.show {
+  display: block;
+}
+
+.status.info {
+  color: var(--blue);
+  background: #e5f2fc;
+}
+
+.status.success {
+  color: #267a4c;
+  background: #e8f1ec;
+}
+
+.status.error {
+  color: var(--red);
+  background: #fce9e7;
+}
+
+.loading {
+  padding: 24px;
+  color: var(--sub);
+  text-align: center;
+}
+
+.label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.dropdown-toggle.open {
+  border-color: var(--green);
+  box-shadow:
+    0 0 0 3px
+    rgba(22,163,74,.13);
+}
+
+.arrow {
+  color: var(--sub);
+  font-size: 15px;
+}
+
+.dropdown-toggle.open .arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow:
+    0 14px 32px
+    rgba(0,0,0,.16);
+  -webkit-overflow-scrolling: touch;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  color: var(--text);
+  background: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: left;
+}
+
+.option + .option {
+  margin-top: 2px;
+}
+
+.option.selected {
+  color: #166534;
+  background: #dcfce7;
+  font-weight: 800;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px 12px;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 17px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--green);
+  box-shadow:
+    0 0 0 3px
+    rgba(22,163,74,.13);
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.amount {
+  position: relative;
+}
+
+.yen {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: var(--sub);
+  transform: translateY(-50%);
+}
+
+#amount {
+  padding-left: 36px;
+  font-weight: 800;
+}
+
+.save {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 20px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #16a34a,
+      #22c55e 45%,
+      #14b8a6
+    );
+  border: 0;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow:
+    0 14px 28px
+    rgba(34,197,94,.22);
+}
+
+.save:disabled {
+  opacity: 0.6;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns:
+    repeat(3,1fr);
+  gap: 8px;
+}
+
+.total {
+  padding: 14px 10px;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.total-name {
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.total-value {
+  margin-top: 7px;
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+  max-height: 65vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.history-item {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-date {
+  color: var(--sub);
+  font-size: 12px;
+}
+
+.history-amount {
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.history-main {
+  margin-top: 7px;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.history-memo {
+  margin-top: 5px;
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.empty {
+  padding: 30px;
+  color: var(--sub);
+  text-align: center;
+}
+
+.last {
+  display: none;
+  margin-top: 12px;
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.last.show {
+  display: block;
+}
+
+.tabs {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  padding:
+    10px
+    16px
+    calc(
+      10px +
+      env(safe-area-inset-bottom)
+    );
+  background:
+    rgba(245,247,248,.94);
+  border-top:
+    1px solid var(--border);
+  backdrop-filter:
+    blur(12px);
+}
+
+.tab-inner {
+  display: grid;
+  grid-template-columns:
+    1fr 1fr;
+  gap: 8px;
+  max-width: 480px;
+  margin: auto;
+  padding: 5px;
+  background: #e9edf2;
+  border-radius: 16px;
+}
+
+.tab {
+  min-height: 44px;
+  color: var(--sub);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.tab.active {
+  color: var(--text);
+  background: #ffffff;
+  box-shadow:
+    0 3px 10px
+    rgba(0,0,0,.08);
+}
+
+@media (max-width:520px) {
+  body {
+    padding:
+      12px
+      12px
+      92px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .total-value {
+    font-size: 18px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="app">
-    <header class="header">
-      <h1>Money Log House</h1>
+<div class="app">
+  <header class="header">
+    <h1>Money Log House</h1>
 
-      <div class="meta">
-        <div>
-          Date:
-          <span id="todayText">Loading...</span>
+    <div class="meta">
+      <div>
+        Date:
+        <span id="todayText">
+          Loading...
+        </span>
+      </div>
+
+      <div>
+        Sheet:
+        <span id="sheetName">
+          Loading...
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <section
+    id="logScreen"
+    class="screen active"
+  >
+    <div class="card">
+      <h2 class="title">
+        Log Entry
+      </h2>
+
+      <div
+        id="status"
+        class="status"
+      ></div>
+
+      <div
+        id="loading"
+        class="loading"
+      >
+        Loading...
+      </div>
+
+      <form
+        id="form"
+        style="display:none"
+      >
+        <label class="label">
+          Category
+        </label>
+
+        <div class="dropdown">
+          <button
+            id="categoryToggle"
+            class="dropdown-toggle"
+            type="button"
+          >
+            <span id="categoryLabel">
+              Select Category
+            </span>
+
+            <span class="arrow">
+              ▼
+            </span>
+          </button>
+
+          <div
+            id="categoryMenu"
+            class="dropdown-menu"
+          ></div>
         </div>
 
-        <div>
-          Sheet:
-          <span id="sheetName">Loading...</span>
+        <label class="label">
+          Item
+        </label>
+
+        <div class="dropdown">
+          <button
+            id="itemToggle"
+            class="dropdown-toggle"
+            type="button"
+          >
+            <span id="itemLabel">
+              Select Item
+            </span>
+
+            <span class="arrow">
+              ▼
+            </span>
+          </button>
+
+          <div
+            id="itemMenu"
+            class="dropdown-menu"
+          ></div>
+        </div>
+
+        <label
+          class="label"
+          for="amount"
+        >
+          Amount
+        </label>
+
+        <div class="amount">
+          <span class="yen">¥</span>
+
+          <input
+            id="amount"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            placeholder="Amount"
+            required
+          >
+        </div>
+
+        <label
+          class="label"
+          for="memo"
+        >
+          Memo
+        </label>
+
+        <textarea
+          id="memo"
+          placeholder="Optional note"
+        ></textarea>
+
+        <button
+          id="save"
+          class="save"
+          type="submit"
+        >
+          Save
+        </button>
+      </form>
+
+      <div
+        id="last"
+        class="last"
+      ></div>
+    </div>
+
+    <div class="card">
+      <h2 class="title">
+        This Month
+      </h2>
+
+      <div class="totals">
+        <div class="total">
+          <div class="total-name">
+            Food
+          </div>
+
+          <div
+            id="foodTotal"
+            class="total-value"
+          >
+            ¥0
+          </div>
+        </div>
+
+        <div class="total">
+          <div class="total-name">
+            Daily Goods
+          </div>
+
+          <div
+            id="dailyTotal"
+            class="total-value"
+          >
+            ¥0
+          </div>
+        </div>
+
+        <div class="total">
+          <div class="total-name">
+            Card
+          </div>
+
+          <div
+            id="cardTotal"
+            class="total-value"
+          >
+            ¥0
+          </div>
         </div>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <section
-      id="inputScreen"
-      class="screen active"
-    >
-      <div class="card">
-        <h2 class="section-title">
-          Log Entry
-        </h2>
+  <section
+    id="historyScreen"
+    class="screen"
+  >
+    <div class="card">
+      <h2 class="title">
+        History
+      </h2>
 
-        <div
-          id="status"
-          class="status"
-        ></div>
-
-        <div
-          id="loading"
-          class="loading"
-        >
+      <div
+        id="historyList"
+        class="history-list"
+      >
+        <div class="empty">
           Loading...
         </div>
-
-        <form
-          id="form"
-          style="display:none"
-        >
-          <label class="field-label">
-            Category
-          </label>
-
-          <div class="dropdown">
-            <button
-              id="categoryToggle"
-              class="dropdown-toggle"
-              type="button"
-              aria-expanded="false"
-            >
-              <span id="categoryLabel">
-                Select Category
-              </span>
-
-              <span class="dropdown-arrow">
-                ▼
-              </span>
-            </button>
-
-            <div
-              id="categoryMenu"
-              class="dropdown-menu"
-            ></div>
-          </div>
-
-          <label class="field-label">
-            Item
-          </label>
-
-          <div class="dropdown">
-            <button
-              id="itemToggle"
-              class="dropdown-toggle"
-              type="button"
-              aria-expanded="false"
-            >
-              <span id="itemLabel">
-                Select Item
-              </span>
-
-              <span class="dropdown-arrow">
-                ▼
-              </span>
-            </button>
-
-            <div
-              id="itemMenu"
-              class="dropdown-menu"
-            ></div>
-          </div>
-
-          <label
-            class="field-label"
-            for="amount"
-          >
-            Amount
-          </label>
-
-          <div class="amount-box">
-            <span class="yen">¥</span>
-
-            <input
-              id="amount"
-              type="number"
-              inputmode="numeric"
-              min="1"
-              placeholder="Amount"
-              required
-            >
-          </div>
-
-          <label
-            class="field-label"
-            for="memo"
-          >
-            Memo
-          </label>
-
-          <textarea
-            id="memo"
-            placeholder="Optional note"
-          ></textarea>
-
-          <button
-            id="submitButton"
-            class="submit"
-            type="submit"
-          >
-            Save
-          </button>
-        </form>
-
-        <div
-          id="last"
-          class="last"
-        ></div>
       </div>
-    </section>
-
-    <section
-      id="summaryScreen"
-      class="screen"
-    >
-      <div class="card">
-        <h2 class="section-title">
-          Monthly Snapshot
-        </h2>
-
-        <div class="summary-list">
-          <div class="summary-item">
-            <div class="summary-top">
-              <div class="summary-label">
-                Social
-              </div>
-
-              <div class="summary-right">
-                <div
-                  id="socialBudget"
-                  class="summary-budget"
-                >
-                  ¥0
-                </div>
-
-                <div
-                  id="socialBalance"
-                  class="summary-balance plus"
-                >
-                  ¥0
-                </div>
-              </div>
-            </div>
-
-            <div
-              id="socialRemaining"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-
-          <div class="summary-item">
-            <div class="summary-top">
-              <div class="summary-label">
-                Food
-              </div>
-
-              <div class="summary-right">
-                <div
-                  id="foodBudget"
-                  class="summary-budget"
-                >
-                  ¥0
-                </div>
-
-                <div
-                  id="foodBalance"
-                  class="summary-balance plus"
-                >
-                  ¥0
-                </div>
-              </div>
-            </div>
-
-            <div
-              id="foodRemaining"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-
-          <div class="summary-item">
-            <div class="summary-label">
-              Card Payment
-            </div>
-
-            <div
-              id="cardPayment"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <nav class="tabs">
-    <div class="tab-inner">
-      <button
-        id="inputTab"
-        class="tab-button active"
-        type="button"
-      >
-        Log
-      </button>
-
-      <button
-        id="summaryTab"
-        class="tab-button"
-        type="button"
-      >
-        Summary
-      </button>
     </div>
-  </nav>
+  </section>
+</div>
 
-  <script>
-    /*
-     * 共通家計簿用Apps Script
-     */
-    const API_URL =
-      'https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec';
+<nav class="tabs">
+  <div class="tab-inner">
+    <button
+      id="logTab"
+      class="tab active"
+      type="button"
+    >
+      Log
+    </button>
 
-    const getElement = function(id) {
-      return document.getElementById(id);
-    };
+    <button
+      id="historyTab"
+      class="tab"
+      type="button"
+    >
+      History
+    </button>
+  </div>
+</nav>
 
-    let selectedCategory = '';
-    let selectedItem = '';
+<script>
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec';
 
-    window.addEventListener(
-      'load',
-      function() {
-        showStatus(
-          'Loading data...',
-          'info'
-        );
+const getElement = function(id) {
+  return document.getElementById(id);
+};
 
-        callApi('init')
-          .then(initializeApp)
-          .catch(handleError);
-      }
+let selectedCategory = '';
+let selectedItem = '';
+
+window.addEventListener(
+  'load',
+  function() {
+    showStatus(
+      'Loading data...',
+      'info'
     );
 
-    getElement('inputTab')
-      .addEventListener(
-        'click',
-        function() {
-          switchScreen(false);
-        }
-      );
+    callApi('init')
+      .then(initializeApp)
+      .catch(handleError);
+  }
+);
 
-    getElement('summaryTab')
-      .addEventListener(
-        'click',
-        function() {
-          switchScreen(true);
-        }
-      );
+getElement('logTab').onclick =
+  function() {
+    switchScreen(false);
+  };
 
-    getElement('categoryToggle')
-      .addEventListener(
-        'click',
-        function(event) {
-          event.stopPropagation();
-          toggleMenu('category');
-        }
-      );
+getElement('historyTab').onclick =
+  function() {
+    switchScreen(true);
+  };
 
-    getElement('itemToggle')
-      .addEventListener(
-        'click',
-        function(event) {
-          event.stopPropagation();
-          toggleMenu('item');
-        }
-      );
+getElement('categoryToggle').onclick =
+  function(event) {
+    event.stopPropagation();
+    toggleMenu('category');
+  };
 
-    document.addEventListener(
-      'click',
-      closeMenus
+getElement('itemToggle').onclick =
+  function(event) {
+    event.stopPropagation();
+    toggleMenu('item');
+  };
+
+document.addEventListener(
+  'click',
+  closeMenus
+);
+
+function toggleMenu(type) {
+  const menu =
+    getElement(type + 'Menu');
+
+  const button =
+    getElement(type + 'Toggle');
+
+  const willOpen =
+    !menu.classList.contains(
+      'open'
     );
 
-    function toggleMenu(type) {
-      const menu =
-        getElement(type + 'Menu');
+  closeMenus();
 
-      const toggle =
-        getElement(type + 'Toggle');
+  if (willOpen) {
+    menu.classList.add('open');
+    button.classList.add('open');
+  }
+}
 
-      const willOpen =
-        !menu.classList.contains(
-          'open'
+function closeMenus() {
+  ['category', 'item']
+    .forEach(function(type) {
+      getElement(type + 'Menu')
+        .classList.remove('open');
+
+      getElement(type + 'Toggle')
+        .classList.remove('open');
+    });
+}
+
+function switchScreen(
+  showHistory
+) {
+  closeMenus();
+
+  getElement('logScreen')
+    .classList.toggle(
+      'active',
+      !showHistory
+    );
+
+  getElement('historyScreen')
+    .classList.toggle(
+      'active',
+      showHistory
+    );
+
+  getElement('logTab')
+    .classList.toggle(
+      'active',
+      !showHistory
+    );
+
+  getElement('historyTab')
+    .classList.toggle(
+      'active',
+      showHistory
+    );
+
+  if (showHistory) {
+    callApi('history')
+      .then(function(data) {
+        updateTotals(
+          data.totals
         );
 
-      closeMenus();
-
-      if (willOpen) {
-        menu.classList.add('open');
-        toggle.classList.add('open');
-
-        toggle.setAttribute(
-          'aria-expanded',
-          'true'
+        renderHistory(
+          data.history
         );
+      })
+      .catch(handleError);
+  }
+}
+
+function callApi(
+  action,
+  params
+) {
+  params = params || {};
+
+  return new Promise(
+    function(resolve, reject) {
+      const callbackName =
+        'callback_' +
+        Date.now() +
+        '_' +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+      let finished = false;
+
+      const timeoutId =
+        setTimeout(
+          function() {
+            finish(
+              new Error(
+                'Loading timed out.'
+              )
+            );
+          },
+          15000
+        );
+
+      function finish(
+        error,
+        data
+      ) {
+        if (finished) {
+          return;
+        }
+
+        finished = true;
+
+        clearTimeout(timeoutId);
+
+        delete window[
+          callbackName
+        ];
+
+        if (script.parentNode) {
+          script.parentNode
+            .removeChild(script);
+        }
+
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
       }
-    }
 
-    function closeMenus() {
-      ['category', 'item']
-        .forEach(function(type) {
-          const menu =
-            getElement(type + 'Menu');
+      window[callbackName] =
+        function(data) {
+          if (
+            data &&
+            data.success !== false
+          ) {
+            finish(null, data);
+          } else {
+            finish(
+              new Error(
+                data &&
+                data.message
+                  ? data.message
+                  : 'API error.'
+              )
+            );
+          }
+        };
 
-          const toggle =
-            getElement(type + 'Toggle');
+      const query = [
+        'action=' +
+          encodeURIComponent(
+            action
+          ),
 
-          menu.classList.remove(
-            'open'
-          );
+        'callback=' +
+          encodeURIComponent(
+            callbackName
+          )
+      ];
 
-          toggle.classList.remove(
-            'open'
-          );
-
-          toggle.setAttribute(
-            'aria-expanded',
-            'false'
+      Object.keys(params)
+        .forEach(function(key) {
+          query.push(
+            encodeURIComponent(
+              key
+            ) +
+            '=' +
+            encodeURIComponent(
+              params[key]
+            )
           );
         });
+
+      script.src =
+        API_URL +
+        '?' +
+        query.join('&');
+
+      script.onerror =
+        function() {
+          finish(
+            new Error(
+              'Could not connect to the API.'
+            )
+          );
+        };
+
+      document.body
+        .appendChild(script);
     }
+  );
+}
 
-    function switchScreen(isSummary) {
-      closeMenus();
+function initializeApp(data) {
+  getElement('todayText')
+    .textContent =
+      data.todayText || '';
 
-      getElement('inputScreen')
-        .classList.toggle(
-          'active',
-          !isSummary
+  getElement('sheetName')
+    .textContent =
+      data.sheetName || '';
+
+  renderMenu(
+    'category',
+    data.categories || []
+  );
+
+  renderMenu(
+    'item',
+    data.items || []
+  );
+
+  updateTotals(
+    data.totals
+  );
+
+  renderHistory(
+    data.history
+  );
+
+  getElement('loading')
+    .style.display = 'none';
+
+  getElement('form')
+    .style.display = 'block';
+
+  hideStatus();
+}
+
+function renderMenu(
+  type,
+  options
+) {
+  const menu =
+    getElement(type + 'Menu');
+
+  const label =
+    getElement(type + 'Label');
+
+  menu.innerHTML = '';
+
+  options.forEach(
+    function(value, index) {
+      const button =
+        document.createElement(
+          'button'
         );
 
-      getElement('summaryScreen')
-        .classList.toggle(
-          'active',
-          isSummary
+      button.type = 'button';
+
+      button.className =
+        'option' +
+        (
+          index === 0
+            ? ' selected'
+            : ''
         );
 
-      getElement('inputTab')
-        .classList.toggle(
-          'active',
-          !isSummary
-        );
+      button.textContent =
+        value;
 
-      getElement('summaryTab')
-        .classList.toggle(
-          'active',
-          isSummary
-        );
+      if (index === 0) {
+        label.textContent =
+          value;
 
-      if (isSummary) {
-        callApi('summary')
-          .then(function(data) {
-            updateSummary(
-              data.summary || {}
-            );
-          })
-          .catch(handleError);
-      }
-    }
-
-    function callApi(action, params) {
-      params = params || {};
-
-      return new Promise(
-        function(resolve, reject) {
-          const callbackName =
-            'callback_' +
-            Date.now() +
-            '_' +
-            Math.floor(
-              Math.random() * 100000
-            );
-
-          const script =
-            document.createElement(
-              'script'
-            );
-
-          let finished = false;
-
-          const timeoutId =
-            setTimeout(
-              function() {
-                finish(
-                  new Error(
-                    'Loading timed out.'
-                  )
-                );
-              },
-              15000
-            );
-
-          function cleanup() {
-            clearTimeout(timeoutId);
-
-            delete window[
-              callbackName
-            ];
-
-            if (script.parentNode) {
-              script.parentNode
-                .removeChild(script);
-            }
-          }
-
-          function finish(
-            error,
-            data
-          ) {
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-            cleanup();
-
-            if (error) {
-              reject(error);
-            } else {
-              resolve(data);
-            }
-          }
-
-          window[callbackName] =
-            function(data) {
-              if (
-                !data ||
-                data.success === false
-              ) {
-                finish(
-                  new Error(
-                    data &&
-                    data.message
-                      ? data.message
-                      : 'API error.'
-                  )
-                );
-
-                return;
-              }
-
-              finish(null, data);
-            };
-
-          const query = [
-            'action=' +
-              encodeURIComponent(
-                action
-              ),
-
-            'callback=' +
-              encodeURIComponent(
-                callbackName
-              )
-          ];
-
-          Object.keys(params)
-            .forEach(function(key) {
-              query.push(
-                encodeURIComponent(
-                  key
-                ) +
-                '=' +
-                encodeURIComponent(
-                  params[key]
-                )
-              );
-            });
-
-          script.src =
-            API_URL +
-            '?' +
-            query.join('&');
-
-          script.onerror =
-            function() {
-              finish(
-                new Error(
-                  'Could not connect to the API.'
-                )
-              );
-            };
-
-          document.body
-            .appendChild(script);
+        if (
+          type === 'category'
+        ) {
+          selectedCategory =
+            value;
+        } else {
+          selectedItem =
+            value;
         }
-      );
+      }
+
+      button.onclick =
+        function(event) {
+          event.stopPropagation();
+
+          menu
+            .querySelectorAll(
+              '.option'
+            )
+            .forEach(
+              function(target) {
+                target.classList.remove(
+                  'selected'
+                );
+              }
+            );
+
+          button.classList.add(
+            'selected'
+          );
+
+          label.textContent =
+            value;
+
+          if (
+            type === 'category'
+          ) {
+            selectedCategory =
+              value;
+          } else {
+            selectedItem =
+              value;
+          }
+
+          closeMenus();
+        };
+
+      menu.appendChild(button);
     }
+  );
+}
 
-    function initializeApp(data) {
-      getElement('todayText')
-        .textContent =
-          data.todayText || '';
+getElement('form')
+  .addEventListener(
+    'submit',
+    function(event) {
+      event.preventDefault();
 
-      getElement('sheetName')
-        .textContent =
-          data.sheetName || '';
+      const amount =
+        getElement('amount')
+          .value;
 
-      renderMenu(
-        'category',
-        data.categories || []
+      const memo =
+        getElement('memo')
+          .value;
+
+      if (!selectedCategory) {
+        showStatus(
+          'Please select a Category.',
+          'error'
+        );
+
+        return;
+      }
+
+      if (!selectedItem) {
+        showStatus(
+          'Please select an Item.',
+          'error'
+        );
+
+        return;
+      }
+
+      if (
+        !amount ||
+        Number(amount) <= 0
+      ) {
+        showStatus(
+          'Please enter an Amount.',
+          'error'
+        );
+
+        return;
+      }
+
+      const saveButton =
+        getElement('save');
+
+      saveButton.disabled =
+        true;
+
+      saveButton.textContent =
+        'Saving...';
+
+      showStatus(
+        'Saving...',
+        'info'
       );
 
-      renderMenu(
-        'item',
-        data.items || []
-      );
+      callApi(
+        'add',
+        {
+          category:
+            selectedCategory,
 
-      updateSummary(
-        data.summary || {}
-      );
+          item:
+            selectedItem,
 
-      getElement('loading')
-        .style.display = 'none';
+          amount:
+            amount,
 
-      getElement('form')
-        .style.display = 'block';
-
-      hideStatus();
+          memo:
+            memo
+        }
+      )
+        .then(handleSaved)
+        .catch(handleError);
     }
+  );
 
-    function renderMenu(
-      type,
-      options
-    ) {
-      const menu =
-        getElement(type + 'Menu');
+function handleSaved(data) {
+  showStatus(
+    'Saved.',
+    'success'
+  );
 
-      const label =
-        getElement(type + 'Label');
+  if (navigator.vibrate) {
+    navigator.vibrate(80);
+  }
 
-      menu.innerHTML = '';
+  const saved =
+    data.saved || {};
 
-      if (!options.length) {
-        const empty =
+  const last =
+    getElement('last');
+
+  last.className =
+    'last show';
+
+  last.textContent =
+    (saved.date || '') +
+    ' ' +
+    (
+      saved.category ||
+      'Card Payment'
+    ) +
+    ' ' +
+    (saved.item || '') +
+    ' ¥' +
+    Number(
+      saved.amount || 0
+    ).toLocaleString() +
+    (
+      saved.memo
+        ? ' ' + saved.memo
+        : ''
+    );
+
+  updateTotals(
+    data.totals
+  );
+
+  renderHistory(
+    data.history
+  );
+
+  getElement('amount')
+    .value = '';
+
+  getElement('memo')
+    .value = '';
+
+  const saveButton =
+    getElement('save');
+
+  saveButton.disabled =
+    false;
+
+  saveButton.textContent =
+    'Save';
+}
+
+function updateTotals(data) {
+  data = data || {};
+
+  getElement('foodTotal')
+    .textContent =
+      formatYen(data.food);
+
+  getElement('dailyTotal')
+    .textContent =
+      formatYen(data.daily);
+
+  getElement('cardTotal')
+    .textContent =
+      formatYen(data.card);
+}
+
+function renderHistory(rows) {
+  rows = rows || [];
+
+  const list =
+    getElement('historyList');
+
+  list.innerHTML = '';
+
+  if (!rows.length) {
+    list.innerHTML =
+      '<div class="empty">' +
+      'No history yet.' +
+      '</div>';
+
+    return;
+  }
+
+  rows.forEach(
+    function(row) {
+      const item =
+        document.createElement(
+          'div'
+        );
+
+      item.className =
+        'history-item';
+
+      const top =
+        document.createElement(
+          'div'
+        );
+
+      top.className =
+        'history-top';
+
+      const date =
+        document.createElement(
+          'div'
+        );
+
+      date.className =
+        'history-date';
+
+      date.textContent =
+        row.date || '';
+
+      const amount =
+        document.createElement(
+          'div'
+        );
+
+      amount.className =
+        'history-amount';
+
+      amount.textContent =
+        formatYen(row.amount);
+
+      top.appendChild(date);
+      top.appendChild(amount);
+
+      const main =
+        document.createElement(
+          'div'
+        );
+
+      main.className =
+        'history-main';
+
+      main.textContent =
+        (
+          row.category ||
+          'Card Payment'
+        ) +
+        ' · ' +
+        (row.item || '');
+
+      item.appendChild(top);
+      item.appendChild(main);
+
+      if (row.memo) {
+        const memo =
           document.createElement(
             'div'
           );
 
-        empty.className =
-          'empty-options';
+        memo.className =
+          'history-memo';
 
-        empty.textContent =
-          type === 'category'
-            ? 'C21の入力規則に選択肢がありません。'
-            : 'D21の入力規則に選択肢がありません。';
+        memo.textContent =
+          row.memo;
 
-        menu.appendChild(empty);
-        return;
+        item.appendChild(memo);
       }
 
-      options.forEach(
-        function(value, index) {
-          const button =
-            document.createElement(
-              'button'
-            );
-
-          button.type = 'button';
-
-          button.className =
-            'dropdown-option';
-
-          button.textContent =
-            value;
-
-          if (index === 0) {
-            button.classList.add(
-              'selected'
-            );
-
-            label.textContent =
-              value;
-
-            if (
-              type === 'category'
-            ) {
-              selectedCategory =
-                value;
-            } else {
-              selectedItem =
-                value;
-            }
-          }
-
-          button.addEventListener(
-            'click',
-            function(event) {
-              event.stopPropagation();
-
-              const buttons =
-                menu.querySelectorAll(
-                  '.dropdown-option'
-                );
-
-              buttons.forEach(
-                function(target) {
-                  target.classList.remove(
-                    'selected'
-                  );
-                }
-              );
-
-              button.classList.add(
-                'selected'
-              );
-
-              label.textContent =
-                value;
-
-              if (
-                type === 'category'
-              ) {
-                selectedCategory =
-                  value;
-              } else {
-                selectedItem =
-                  value;
-              }
-
-              closeMenus();
-            }
-          );
-
-          menu.appendChild(button);
-        }
-      );
+      list.appendChild(item);
     }
+  );
+}
 
-    getElement('form')
-      .addEventListener(
-        'submit',
-        function(event) {
-          event.preventDefault();
+function formatYen(value) {
+  return (
+    '¥' +
+    Number(
+      value || 0
+    ).toLocaleString()
+  );
+}
 
-          const amount =
-            getElement('amount')
-              .value;
+function showStatus(
+  message,
+  type
+) {
+  const status =
+    getElement('status');
 
-          const memo =
-            getElement('memo')
-              .value;
+  status.textContent =
+    message;
 
-          if (!selectedCategory) {
-            showStatus(
-              'Please select a Category.',
-              'error'
-            );
+  status.className =
+    'status show ' + type;
+}
 
-            return;
-          }
+function hideStatus() {
+  const status =
+    getElement('status');
 
-          if (!selectedItem) {
-            showStatus(
-              'Please select an Item.',
-              'error'
-            );
+  status.textContent = '';
+  status.className =
+    'status';
+}
 
-            return;
-          }
+function handleError(error) {
+  getElement('loading')
+    .style.display = 'none';
 
-          if (
-            !amount ||
-            Number(amount) <= 0
-          ) {
-            showStatus(
-              'Please enter an Amount.',
-              'error'
-            );
+  showStatus(
+    error.message ||
+      String(error),
+    'error'
+  );
 
-            getElement('amount')
-              .focus();
+  const saveButton =
+    getElement('save');
 
-            return;
-          }
+  saveButton.disabled =
+    false;
 
-          const submitButton =
-            getElement(
-              'submitButton'
-            );
-
-          submitButton.disabled =
-            true;
-
-          submitButton.textContent =
-            'Saving...';
-
-          showStatus(
-            'Saving...',
-            'info'
-          );
-
-          callApi('add', {
-            category:
-              selectedCategory,
-
-            item:
-              selectedItem,
-
-            amount:
-              amount,
-
-            memo:
-              memo
-          })
-            .then(handleSaved)
-            .catch(handleError);
-        }
-      );
-
-    function handleSaved(result) {
-      showStatus(
-        'Saved.',
-        'success'
-      );
-
-      if (navigator.vibrate) {
-        navigator.vibrate(80);
-      }
-
-      const saved =
-        result.saved || {};
-
-      const last =
-        getElement('last');
-
-      last.className =
-        'last show';
-
-      last.textContent =
-        'Last saved: ' +
-        (result.sheetName || '') +
-        ' / Row ' +
-        (result.row || '') +
-        ' — ' +
-        (saved.date || '') +
-        ' ' +
-        (
-          saved.category ||
-          'Card Payment'
-        ) +
-        ' ' +
-        (saved.item || '') +
-        ' ¥' +
-        Number(
-          saved.amount || 0
-        ).toLocaleString() +
-        (
-          saved.memo
-            ? ' ' + saved.memo
-            : ''
-        );
-
-      updateSummary(
-        result.summary || {}
-      );
-
-      getElement('amount')
-        .value = '';
-
-      getElement('memo')
-        .value = '';
-
-      const submitButton =
-        getElement(
-          'submitButton'
-        );
-
-      submitButton.disabled =
-        false;
-
-      submitButton.textContent =
-        'Save';
-
-      getElement('amount')
-        .focus();
-    }
-
-    function updateSummary(summary) {
-      getElement(
-        'socialBudget'
-      ).textContent =
-        formatYen(
-          summary.socialBudget
-        );
-
-      getElement(
-        'socialRemaining'
-      ).textContent =
-        formatYen(
-          summary.socialRemaining
-        );
-
-      setBalance(
-        getElement(
-          'socialBalance'
-        ),
-        summary.socialBalance
-      );
-
-      getElement(
-        'foodBudget'
-      ).textContent =
-        formatYen(
-          summary.foodBudget
-        );
-
-      getElement(
-        'foodRemaining'
-      ).textContent =
-        formatYen(
-          summary.foodRemaining
-        );
-
-      setBalance(
-        getElement(
-          'foodBalance'
-        ),
-        summary.foodBalance
-      );
-
-      getElement(
-        'cardPayment'
-      ).textContent =
-        formatYen(
-          summary.cardPayment
-        );
-    }
-
-    function setBalance(
-      element,
-      value
-    ) {
-      const number =
-        Number(value || 0);
-
-      element.textContent =
-        (
-          number < 0
-            ? '-'
-            : ''
-        ) +
-        formatYen(
-          Math.abs(number)
-        );
-
-      element.classList.toggle(
-        'minus',
-        number < 0
-      );
-
-      element.classList.toggle(
-        'plus',
-        number >= 0
-      );
-    }
-
-    function formatYen(value) {
-      return (
-        '¥' +
-        Number(
-          value || 0
-        ).toLocaleString()
-      );
-    }
-
-    function showStatus(
-      message,
-      type
-    ) {
-      const status =
-        getElement('status');
-
-      status.textContent =
-        message;
-
-      status.className =
-        'status show ' + type;
-    }
-
-    function hideStatus() {
-      const status =
-        getElement('status');
-
-      status.textContent = '';
-
-      status.className =
-        'status';
-    }
-
-    function handleError(error) {
-      getElement('loading')
-        .style.display = 'none';
-
-      showStatus(
-        error.message ||
-          String(error),
-        'error'
-      );
-
-      const submitButton =
-        getElement(
-          'submitButton'
-        );
-
-      submitButton.disabled =
-        false;
-
-      submitButton.textContent =
-        'Save';
-    }
-  </script>
+  saveButton.textContent =
+    'Save';
+}
+</script>
 </body>
 </html>
