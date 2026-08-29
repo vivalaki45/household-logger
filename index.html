@@ -276,7 +276,7 @@ textarea {
 .totals {
   display: grid;
   grid-template-columns:
-    repeat(3,1fr);
+    repeat(2,1fr);
   gap: 8px;
 }
 
@@ -291,6 +291,13 @@ textarea {
   color: var(--sub);
   font-size: 12px;
   font-weight: 800;
+}
+
+.total-budget {
+  margin-top: 5px;
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .total-value {
@@ -588,6 +595,13 @@ textarea {
           </div>
 
           <div
+            id="foodBudget"
+            class="total-budget"
+          >
+            Budget ¥0
+          </div>
+
+          <div
             id="foodTotal"
             class="total-value"
           >
@@ -601,6 +615,13 @@ textarea {
           </div>
 
           <div
+            id="dailyBudget"
+            class="total-budget"
+          >
+            Budget ¥0
+          </div>
+
+          <div
             id="dailyTotal"
             class="total-value"
           >
@@ -610,7 +631,31 @@ textarea {
 
         <div class="total">
           <div class="total-name">
+            Utilities
+          </div>
+
+          <div
+            id="utilitiesBudget"
+            class="total-budget"
+          >
+            Budget ¥0
+          </div>
+
+          <div
+            id="utilitiesTotal"
+            class="total-value"
+          >
+            ¥0
+          </div>
+        </div>
+
+        <div class="total">
+          <div class="total-name">
             Card
+          </div>
+
+          <div class="total-budget">
+            Total
           </div>
 
           <div
@@ -1187,17 +1232,50 @@ function handleSaved(data) {
 function updateTotals(data) {
   data = data || {};
 
+  getElement('foodBudget')
+    .textContent =
+      'Budget ' +
+      formatYen(
+        data.foodBudget
+      );
+
   getElement('foodTotal')
     .textContent =
-      formatYen(data.food);
+      formatYen(
+        data.food
+      );
+
+  getElement('dailyBudget')
+    .textContent =
+      'Budget ' +
+      formatYen(
+        data.dailyBudget
+      );
 
   getElement('dailyTotal')
     .textContent =
-      formatYen(data.daily);
+      formatYen(
+        data.daily
+      );
+
+  getElement('utilitiesBudget')
+    .textContent =
+      'Budget ' +
+      formatYen(
+        data.utilitiesBudget
+      );
+
+  getElement('utilitiesTotal')
+    .textContent =
+      formatYen(
+        data.utilities
+      );
 
   getElement('cardTotal')
     .textContent =
-      formatYen(data.card);
+      formatYen(
+        data.card
+      );
 }
 
 function renderHistory(rows) {
