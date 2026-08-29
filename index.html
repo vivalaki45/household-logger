@@ -1,1189 +1,1236 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Money Log</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover"
-  >
+<style>
+:root {
+  --bg: #f5f7f8;
+  --card: #fff;
+  --text: #1f2933;
+  --sub: #6b7280;
+  --border: #d9dee3;
+  --green: #16a34a;
+  --red: #d93025;
+  --blue: #1a73e8;
+}
 
-  <title>Money Log</title>
+* {
+  box-sizing: border-box;
+}
 
-  <style>
-    :root {
-      --bg: #f5f7f8;
-      --card: #ffffff;
-      --text: #1f2933;
-      --sub: #6b7280;
-      --border: #d9dee3;
-      --green: #0f9d58;
-      --red: #d93025;
-      --blue: #1a73e8;
-    }
+body {
+  margin: 0;
+  padding: 16px 16px 96px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+.app {
+  max-width: 480px;
+  margin: auto;
+}
 
-    body {
-      margin: 0;
-      padding: 16px 16px 96px;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
+.header {
+  margin-bottom: 16px;
+}
 
-    button,
-    input,
-    textarea {
-      font: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
+h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
 
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-    }
+.meta {
+  color: var(--sub);
+  font-size: 14px;
+  line-height: 1.7;
+}
 
-    .header {
-      margin-bottom: 16px;
-    }
+.card {
+  padding: 18px;
+  background: var(--card);
+  border: 1px solid #e6e5e3;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+}
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
+.screen {
+  display: none;
+}
 
-    .meta {
-      color: var(--sub);
-      font-size: 14px;
-      line-height: 1.7;
-    }
+.screen.active {
+  display: block;
+}
 
-    .card {
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid #e6e5e3;
-      border-radius: 16px;
-      box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.05),
-        0 4px 12px rgba(0, 0, 0, 0.04);
-    }
+.section-title {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
 
-    .screen {
-      display: none;
-    }
+.status {
+  display: none;
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
 
-    .screen.active {
-      display: block;
-    }
+.status.show {
+  display: block;
+}
 
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 20px;
-    }
+.status.info {
+  color: var(--blue);
+  background: #e5f2fc;
+}
 
-    .status {
-      display: none;
-      margin-bottom: 14px;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 14px;
-    }
+.status.success {
+  color: #267a4c;
+  background: #e8f1ec;
+}
 
-    .status.show {
-      display: block;
-    }
+.status.error {
+  color: var(--red);
+  background: #fce9e7;
+}
 
-    .status.info {
-      color: var(--blue);
-      background: #e5f2fc;
-    }
+.loading {
+  padding: 24px;
+  color: var(--sub);
+  text-align: center;
+}
 
-    .status.success {
-      color: #267a4c;
-      background: #e8f1ec;
-    }
+.field-label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+}
 
-    .status.error {
-      color: var(--red);
-      background: #fce9e7;
-    }
+/* Category・Itemの縦スクロールメニュー */
+.dropdown {
+  position: relative;
+}
 
-    .loading {
-      padding: 24px;
-      color: var(--sub);
-      text-align: center;
-    }
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
 
-    .field-label {
-      display: block;
-      margin: 16px 0 8px;
-      font-size: 14px;
-      font-weight: 800;
-    }
+.dropdown-toggle.open {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.13);
+}
 
-    .choice-scroll {
-      overflow-x: auto;
-      padding: 2px 2px 8px;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
+.dropdown-arrow {
+  color: var(--sub);
+  font-size: 15px;
+  transition: transform 0.15s;
+}
 
-    .choice-scroll::-webkit-scrollbar {
-      display: none;
-    }
+.dropdown-toggle.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
 
-    .choice-tabs {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-      min-width: 100%;
-    }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+  -webkit-overflow-scrolling: touch;
+}
 
-    .choice-button {
-      flex: none;
-      min-height: 44px;
-      padding: 10px 15px;
-      color: var(--sub);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 800;
-      white-space: nowrap;
-      cursor: pointer;
-    }
+.dropdown-menu.open {
+  display: block;
+}
 
-    .choice-button.active {
-      color: #ffffff;
-      background:
-        linear-gradient(
-          135deg,
-          #16a34a,
-          #22c55e 50%,
-          #14b8a6
-        );
-      border-color: transparent;
-      box-shadow:
-        0 7px 16px rgba(34, 197, 94, 0.24);
-    }
+.dropdown-option {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  color: var(--text);
+  background: #fff;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
 
-    .empty-options {
-      padding: 12px;
-      color: var(--sub);
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      font-size: 13px;
-    }
+.dropdown-option + .dropdown-option {
+  margin-top: 2px;
+}
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 14px 12px;
-      color: var(--text);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      outline: none;
-      font-size: 18px;
-    }
+.dropdown-option:hover,
+.dropdown-option:focus-visible {
+  background: #f0fdf4;
+  outline: none;
+}
 
-    input:focus,
-    textarea:focus {
-      border-color: var(--green);
-      box-shadow:
-        0 0 0 3px rgba(15, 157, 88, 0.14);
-    }
+.dropdown-option.selected {
+  color: #166534;
+  background: #dcfce7;
+  font-weight: 800;
+}
 
-    textarea {
-      min-height: 88px;
-      resize: vertical;
-    }
+.empty-options {
+  padding: 12px;
+  color: var(--sub);
+  font-size: 14px;
+}
 
-    .amount-box {
-      position: relative;
-    }
+input,
+textarea {
+  width: 100%;
+  padding: 14px 12px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 18px;
+  outline: none;
+}
 
-    .yen {
-      position: absolute;
-      top: 50%;
-      left: 14px;
-      color: var(--sub);
-      transform: translateY(-50%);
-    }
+input:focus,
+textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.13);
+}
 
-    #amount {
-      padding-left: 36px;
-      font-weight: 800;
-    }
+textarea {
+  min-height: 88px;
+  resize: vertical;
+}
 
-    .submit {
-      width: 100%;
-      min-height: 56px;
-      margin-top: 20px;
-      color: #ffffff;
-      background:
-        linear-gradient(
-          135deg,
-          #16a34a,
-          #22c55e 45%,
-          #14b8a6
-        );
-      border: 0;
-      border-radius: 16px;
-      font-size: 20px;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow:
-        0 14px 28px rgba(34, 197, 94, 0.25);
-    }
+.amount-box {
+  position: relative;
+}
 
-    .submit:disabled {
-      opacity: 0.6;
-    }
+.yen {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: var(--sub);
+  transform: translateY(-50%);
+}
 
-    .last {
-      display: none;
-      margin-top: 12px;
-      color: var(--sub);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+#amount {
+  padding-left: 36px;
+  font-weight: 800;
+}
 
-    .last.show {
-      display: block;
-    }
+.submit {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 20px;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    #16a34a,
+    #22c55e 45%,
+    #14b8a6
+  );
+  border: 0;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 0 14px 28px rgba(34, 197, 94, 0.25);
+  cursor: pointer;
+}
 
-    .summary-list {
-      display: grid;
-      gap: 12px;
-    }
+.submit:disabled {
+  opacity: 0.6;
+}
 
-    .summary-item {
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
+.last {
+  display: none;
+  margin-top: 12px;
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 1.6;
+}
 
-    .summary-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
+.last.show {
+  display: block;
+}
 
-    .summary-label {
-      color: var(--sub);
-      font-size: 14px;
-      font-weight: 800;
-    }
+.summary-list {
+  display: grid;
+  gap: 12px;
+}
 
-    .summary-right {
-      text-align: right;
-    }
+.summary-item {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
 
-    .summary-budget {
-      color: var(--sub);
-      font-size: 13px;
-      font-weight: 800;
-    }
+.summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
 
-    .summary-balance {
-      margin-top: 4px;
-      font-size: 13px;
-      font-weight: 900;
-    }
+.summary-label {
+  color: var(--sub);
+  font-size: 14px;
+  font-weight: 800;
+}
 
-    .summary-balance.plus {
-      color: var(--blue);
-    }
+.summary-right {
+  text-align: right;
+}
 
-    .summary-balance.minus {
-      color: var(--red);
-    }
+.summary-budget {
+  color: var(--sub);
+  font-size: 13px;
+  font-weight: 800;
+}
 
-    .summary-value {
-      font-size: 34px;
-      font-weight: 760;
-      letter-spacing: -0.025em;
-    }
+.summary-balance {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 900;
+}
 
-    .tabs {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      padding:
-        10px
-        16px
-        calc(10px + env(safe-area-inset-bottom));
-      background: rgba(245, 247, 248, 0.94);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-    }
+.summary-balance.plus {
+  color: var(--blue);
+}
 
-    .tab-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 5px;
-      background: #e9edf2;
-      border-radius: 16px;
-    }
+.summary-balance.minus {
+  color: var(--red);
+}
 
-    .tab-button {
-      min-height: 44px;
-      color: var(--sub);
-      background: transparent;
-      border: 0;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
+.summary-value {
+  font-size: 34px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
+}
 
-    .tab-button.active {
-      color: var(--text);
-      background: #ffffff;
-      box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.08);
-    }
+.tabs {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  padding:
+    10px
+    16px
+    calc(10px + env(safe-area-inset-bottom));
+  background: rgba(245, 247, 248, 0.94);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
 
-    @media (max-width: 520px) {
-      body {
-        padding:
-          12px
-          12px
-          calc(92px + env(safe-area-inset-bottom));
-      }
+.tab-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-width: 480px;
+  margin: auto;
+  padding: 5px;
+  background: #e9edf2;
+  border-radius: 16px;
+}
 
-      h1 {
-        font-size: 28px;
-      }
+.tab-button {
+  min-height: 44px;
+  color: var(--sub);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
 
-      .card {
-        padding: 16px;
-      }
+.tab-button.active {
+  color: var(--text);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
 
-      input,
-      textarea {
-        font-size: 16px;
-      }
+@media (max-width: 520px) {
+  body {
+    padding:
+      12px
+      12px
+      calc(92px + env(safe-area-inset-bottom));
+  }
 
-      .summary-value {
-        font-size: 30px;
-      }
-    }
-  </style>
+  h1 {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  input,
+  textarea {
+    font-size: 16px;
+  }
+
+  .dropdown-menu {
+    max-height: 260px;
+  }
+
+  .summary-value {
+    font-size: 30px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="app">
-    <header class="header">
-      <h1>Money Log</h1>
+<div class="app">
+  <header class="header">
+    <h1>Money Log</h1>
 
-      <div class="meta">
-        <div>
-          Date:
-          <span id="todayText">Loading...</span>
-        </div>
-
-        <div>
-          Sheet:
-          <span id="sheetName">Loading...</span>
-        </div>
+    <div class="meta">
+      <div>
+        Date:
+        <span id="todayText">Loading...</span>
       </div>
-    </header>
 
-    <section
-      id="inputScreen"
-      class="screen active"
-    >
-      <div class="card">
-        <h2 class="section-title">
-          Log Entry
-        </h2>
-
-        <div
-          id="status"
-          class="status"
-        ></div>
-
-        <div
-          id="loading"
-          class="loading"
-        >
-          Loading...
-        </div>
-
-        <form
-          id="form"
-          style="display:none"
-        >
-          <div class="field-label">
-            Category
-          </div>
-
-          <div class="choice-scroll">
-            <div
-              id="categoryTabs"
-              class="choice-tabs"
-            ></div>
-          </div>
-
-          <div class="field-label">
-            Item
-          </div>
-
-          <div class="choice-scroll">
-            <div
-              id="itemTabs"
-              class="choice-tabs"
-            ></div>
-          </div>
-
-          <label
-            class="field-label"
-            for="amount"
-          >
-            Amount
-          </label>
-
-          <div class="amount-box">
-            <span class="yen">¥</span>
-
-            <input
-              id="amount"
-              type="number"
-              inputmode="numeric"
-              min="1"
-              placeholder="Amount"
-              required
-            >
-          </div>
-
-          <label
-            class="field-label"
-            for="memo"
-          >
-            Memo
-          </label>
-
-          <textarea
-            id="memo"
-            placeholder="Optional note"
-          ></textarea>
-
-          <button
-            id="submitButton"
-            class="submit"
-            type="submit"
-          >
-            Save
-          </button>
-        </form>
-
-        <div
-          id="last"
-          class="last"
-        ></div>
+      <div>
+        Sheet:
+        <span id="sheetName">Loading...</span>
       </div>
-    </section>
-
-    <section
-      id="summaryScreen"
-      class="screen"
-    >
-      <div class="card">
-        <h2 class="section-title">
-          Monthly Snapshot
-        </h2>
-
-        <div class="summary-list">
-          <div class="summary-item">
-            <div class="summary-top">
-              <div class="summary-label">
-                Social
-              </div>
-
-              <div class="summary-right">
-                <div
-                  id="socialBudget"
-                  class="summary-budget"
-                >
-                  ¥0
-                </div>
-
-                <div
-                  id="socialBalance"
-                  class="summary-balance plus"
-                >
-                  ¥0
-                </div>
-              </div>
-            </div>
-
-            <div
-              id="socialRemaining"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-
-          <div class="summary-item">
-            <div class="summary-top">
-              <div class="summary-label">
-                Food
-              </div>
-
-              <div class="summary-right">
-                <div
-                  id="foodBudget"
-                  class="summary-budget"
-                >
-                  ¥0
-                </div>
-
-                <div
-                  id="foodBalance"
-                  class="summary-balance plus"
-                >
-                  ¥0
-                </div>
-              </div>
-            </div>
-
-            <div
-              id="foodRemaining"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-
-          <div class="summary-item">
-            <div class="summary-top">
-              <div class="summary-label">
-                Card Payment
-              </div>
-            </div>
-
-            <div
-              id="cardPayment"
-              class="summary-value"
-            >
-              ¥0
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <nav class="tabs">
-    <div class="tab-inner">
-      <button
-        id="inputTab"
-        class="tab-button active"
-        type="button"
-      >
-        Log
-      </button>
-
-      <button
-        id="summaryTab"
-        class="tab-button"
-        type="button"
-      >
-        Summary
-      </button>
     </div>
-  </nav>
+  </header>
 
-  <script>
-    const API_URL =
-      'https://script.google.com/macros/s/AKfycbxGe9RSpDwmY_crff6OGwvI4AxSQIxD7Abl7t7HBFLHhFI1bqTTPZLZD58Ab_Yu4cQ/exec';
+  <section id="inputScreen" class="screen active">
+    <div class="card">
+      <h2 class="section-title">Log Entry</h2>
 
-    const getElement = function(id) {
-      return document.getElementById(id);
-    };
+      <div id="status" class="status"></div>
 
-    const todayTextEl =
-      getElement('todayText');
+      <div id="loading" class="loading">
+        Loading...
+      </div>
 
-    const sheetNameEl =
-      getElement('sheetName');
+      <form id="form" style="display:none">
+        <label class="field-label">
+          Category
+        </label>
 
-    const statusEl =
-      getElement('status');
+        <div class="dropdown">
+          <button
+            id="categoryToggle"
+            class="dropdown-toggle"
+            type="button"
+            aria-expanded="false"
+          >
+            <span id="categoryLabel">
+              Select Category
+            </span>
 
-    const loadingEl =
-      getElement('loading');
+            <span class="dropdown-arrow">
+              ▼
+            </span>
+          </button>
 
-    const formEl =
-      getElement('form');
+          <div
+            id="categoryMenu"
+            class="dropdown-menu"
+          ></div>
+        </div>
 
-    const categoryTabsEl =
-      getElement('categoryTabs');
+        <label class="field-label">
+          Item
+        </label>
 
-    const itemTabsEl =
-      getElement('itemTabs');
+        <div class="dropdown">
+          <button
+            id="itemToggle"
+            class="dropdown-toggle"
+            type="button"
+            aria-expanded="false"
+          >
+            <span id="itemLabel">
+              Select Item
+            </span>
 
-    const amountEl =
-      getElement('amount');
+            <span class="dropdown-arrow">
+              ▼
+            </span>
+          </button>
 
-    const memoEl =
-      getElement('memo');
+          <div
+            id="itemMenu"
+            class="dropdown-menu"
+          ></div>
+        </div>
+
+        <label class="field-label" for="amount">
+          Amount
+        </label>
+
+        <div class="amount-box">
+          <span class="yen">¥</span>
+
+          <input
+            id="amount"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            placeholder="Amount"
+            required
+          >
+        </div>
+
+        <label class="field-label" for="memo">
+          Memo
+        </label>
+
+        <textarea
+          id="memo"
+          placeholder="Optional note"
+        ></textarea>
+
+        <button
+          id="submitButton"
+          class="submit"
+          type="submit"
+        >
+          Save
+        </button>
+      </form>
+
+      <div id="last" class="last"></div>
+    </div>
+  </section>
+
+  <section id="summaryScreen" class="screen">
+    <div class="card">
+      <h2 class="section-title">
+        Monthly Snapshot
+      </h2>
+
+      <div class="summary-list">
+        <div class="summary-item">
+          <div class="summary-top">
+            <div class="summary-label">
+              Social
+            </div>
+
+            <div class="summary-right">
+              <div
+                id="socialBudget"
+                class="summary-budget"
+              >
+                ¥0
+              </div>
+
+              <div
+                id="socialBalance"
+                class="summary-balance plus"
+              >
+                ¥0
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="socialRemaining"
+            class="summary-value"
+          >
+            ¥0
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-top">
+            <div class="summary-label">
+              Food
+            </div>
+
+            <div class="summary-right">
+              <div
+                id="foodBudget"
+                class="summary-budget"
+              >
+                ¥0
+              </div>
+
+              <div
+                id="foodBalance"
+                class="summary-balance plus"
+              >
+                ¥0
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="foodRemaining"
+            class="summary-value"
+          >
+            ¥0
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-label">
+            Card Payment
+          </div>
+
+          <div
+            id="cardPayment"
+            class="summary-value"
+          >
+            ¥0
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs">
+  <div class="tab-inner">
+    <button
+      id="inputTab"
+      class="tab-button active"
+      type="button"
+    >
+      Log
+    </button>
+
+    <button
+      id="summaryTab"
+      class="tab-button"
+      type="button"
+    >
+      Summary
+    </button>
+  </div>
+</nav>
+
+<script>
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbxGe9RSpDwmY_crff6OGwvI4AxSQIxD7Abl7t7HBFLHhFI1bqTTPZLZD58Ab_Yu4cQ/exec';
+
+const getElement = function(id) {
+  return document.getElementById(id);
+};
+
+let selectedCategory = '';
+let selectedItem = '';
+
+window.addEventListener('load', function() {
+  showStatus('Loading data...', 'info');
+
+  callApi('init')
+    .then(initializeApp)
+    .catch(handleError);
+});
+
+getElement('inputTab').addEventListener(
+  'click',
+  function() {
+    switchScreen(false);
+  }
+);
+
+getElement('summaryTab').addEventListener(
+  'click',
+  function() {
+    switchScreen(true);
+  }
+);
+
+getElement('categoryToggle').addEventListener(
+  'click',
+  function(event) {
+    event.stopPropagation();
+    toggleMenu('category');
+  }
+);
+
+getElement('itemToggle').addEventListener(
+  'click',
+  function(event) {
+    event.stopPropagation();
+    toggleMenu('item');
+  }
+);
+
+document.addEventListener('click', function() {
+  closeMenus();
+});
+
+function toggleMenu(type) {
+  const menu =
+    getElement(type + 'Menu');
+
+  const toggle =
+    getElement(type + 'Toggle');
+
+  const willOpen =
+    !menu.classList.contains('open');
+
+  closeMenus();
+
+  if (willOpen) {
+    menu.classList.add('open');
+    toggle.classList.add('open');
+
+    toggle.setAttribute(
+      'aria-expanded',
+      'true'
+    );
+  }
+}
+
+function closeMenus() {
+  ['category', 'item'].forEach(
+    function(type) {
+      const menu =
+        getElement(type + 'Menu');
+
+      const toggle =
+        getElement(type + 'Toggle');
+
+      menu.classList.remove('open');
+      toggle.classList.remove('open');
+
+      toggle.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+    }
+  );
+}
+
+function switchScreen(isSummary) {
+  closeMenus();
+
+  getElement('inputScreen')
+    .classList.toggle(
+      'active',
+      !isSummary
+    );
+
+  getElement('summaryScreen')
+    .classList.toggle(
+      'active',
+      isSummary
+    );
+
+  getElement('inputTab')
+    .classList.toggle(
+      'active',
+      !isSummary
+    );
+
+  getElement('summaryTab')
+    .classList.toggle(
+      'active',
+      isSummary
+    );
+
+  if (isSummary) {
+    callApi('summary')
+      .then(function(data) {
+        updateSummary(
+          data.summary || {}
+        );
+      })
+      .catch(handleError);
+  }
+}
+
+function callApi(action, params) {
+  params = params || {};
+
+  return new Promise(
+    function(resolve, reject) {
+      const callbackName =
+        'callback_' +
+        Date.now() +
+        '_' +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+      const script =
+        document.createElement('script');
+
+      let finished = false;
+
+      const timeoutId =
+        setTimeout(
+          function() {
+            finish(
+              new Error(
+                'Loading timed out.'
+              )
+            );
+          },
+          15000
+        );
+
+      function cleanup() {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+
+        if (script.parentNode) {
+          script.parentNode
+            .removeChild(script);
+        }
+      }
+
+      function finish(error, data) {
+        if (finished) {
+          return;
+        }
+
+        finished = true;
+        cleanup();
+
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      }
+
+      window[callbackName] =
+        function(data) {
+          if (
+            !data ||
+            data.success === false
+          ) {
+            finish(
+              new Error(
+                data && data.message
+                  ? data.message
+                  : 'API error.'
+              )
+            );
+
+            return;
+          }
+
+          finish(null, data);
+        };
+
+      const query = [
+        'action=' +
+          encodeURIComponent(action),
+        'callback=' +
+          encodeURIComponent(
+            callbackName
+          )
+      ];
+
+      Object.keys(params).forEach(
+        function(key) {
+          query.push(
+            encodeURIComponent(key) +
+            '=' +
+            encodeURIComponent(
+              params[key]
+            )
+          );
+        }
+      );
+
+      script.src =
+        API_URL +
+        '?' +
+        query.join('&');
+
+      script.onerror = function() {
+        finish(
+          new Error(
+            'Could not connect to the API.'
+          )
+        );
+      };
+
+      document.body.appendChild(script);
+    }
+  );
+}
+
+function initializeApp(data) {
+  getElement('todayText').textContent =
+    data.todayText || '';
+
+  getElement('sheetName').textContent =
+    data.sheetName || '';
+
+  renderMenu(
+    'category',
+    data.categories || []
+  );
+
+  renderMenu(
+    'item',
+    data.items || []
+  );
+
+  updateSummary(
+    data.summary || {}
+  );
+
+  getElement('loading').style.display =
+    'none';
+
+  getElement('form').style.display =
+    'block';
+
+  hideStatus();
+}
+
+function renderMenu(type, options) {
+  const menu =
+    getElement(type + 'Menu');
+
+  const label =
+    getElement(type + 'Label');
+
+  menu.innerHTML = '';
+
+  if (!options.length) {
+    const empty =
+      document.createElement('div');
+
+    empty.className =
+      'empty-options';
+
+    empty.textContent =
+      'No options found.';
+
+    menu.appendChild(empty);
+    return;
+  }
+
+  options.forEach(
+    function(value, index) {
+      const button =
+        document.createElement('button');
+
+      button.type = 'button';
+      button.className =
+        'dropdown-option';
+
+      button.textContent = value;
+
+      if (index === 0) {
+        button.classList.add(
+          'selected'
+        );
+
+        label.textContent = value;
+
+        if (type === 'category') {
+          selectedCategory = value;
+        } else {
+          selectedItem = value;
+        }
+      }
+
+      button.addEventListener(
+        'click',
+        function(event) {
+          event.stopPropagation();
+
+          const buttons =
+            menu.querySelectorAll(
+              '.dropdown-option'
+            );
+
+          buttons.forEach(
+            function(target) {
+              target.classList.remove(
+                'selected'
+              );
+            }
+          );
+
+          button.classList.add(
+            'selected'
+          );
+
+          label.textContent = value;
+
+          if (type === 'category') {
+            selectedCategory = value;
+          } else {
+            selectedItem = value;
+          }
+
+          closeMenus();
+        }
+      );
+
+      menu.appendChild(button);
+    }
+  );
+}
+
+getElement('form').addEventListener(
+  'submit',
+  function(event) {
+    event.preventDefault();
+
+    const amount =
+      getElement('amount').value;
+
+    const memo =
+      getElement('memo').value;
+
+    if (!selectedCategory) {
+      showStatus(
+        'Please select a Category.',
+        'error'
+      );
+
+      return;
+    }
+
+    if (!selectedItem) {
+      showStatus(
+        'Please select an Item.',
+        'error'
+      );
+
+      return;
+    }
+
+    if (
+      !amount ||
+      Number(amount) <= 0
+    ) {
+      showStatus(
+        'Please enter an Amount.',
+        'error'
+      );
+
+      getElement('amount').focus();
+      return;
+    }
 
     const submitButton =
       getElement('submitButton');
 
-    const lastEl =
-      getElement('last');
+    submitButton.disabled = true;
+    submitButton.textContent =
+      'Saving...';
 
-    let selectedCategory = '';
-    let selectedItem = '';
-
-    window.addEventListener(
-      'load',
-      function() {
-        showStatus(
-          'Loading data...',
-          'info'
-        );
-
-        callApi('init')
-          .then(handleInitialData)
-          .catch(handleError);
-      }
+    showStatus(
+      'Saving...',
+      'info'
     );
 
-    getElement('inputTab').addEventListener(
-      'click',
-      function() {
-        switchScreen('input');
-      }
+    callApi('add', {
+      category: selectedCategory,
+      item: selectedItem,
+      amount: amount,
+      memo: memo
+    })
+      .then(handleSaved)
+      .catch(handleError);
+  }
+);
+
+function handleSaved(result) {
+  showStatus(
+    'Saved.',
+    'success'
+  );
+
+  if (navigator.vibrate) {
+    navigator.vibrate(80);
+  }
+
+  const saved =
+    result.saved || {};
+
+  const last =
+    getElement('last');
+
+  last.className =
+    'last show';
+
+  last.textContent =
+    'Last saved: ' +
+    (result.sheetName || '') +
+    ' / Row ' +
+    (result.row || '') +
+    ' — ' +
+    (saved.date || '') +
+    ' ' +
+    (
+      saved.category ||
+      'Card Payment'
+    ) +
+    ' ' +
+    (saved.item || '') +
+    ' ¥' +
+    Number(
+      saved.amount || 0
+    ).toLocaleString() +
+    (
+      saved.memo
+        ? ' ' + saved.memo
+        : ''
     );
 
-    getElement('summaryTab').addEventListener(
-      'click',
-      function() {
-        switchScreen('summary');
-      }
+  updateSummary(
+    result.summary || {}
+  );
+
+  getElement('amount').value = '';
+  getElement('memo').value = '';
+
+  const submitButton =
+    getElement('submitButton');
+
+  submitButton.disabled = false;
+  submitButton.textContent = 'Save';
+
+  getElement('amount').focus();
+}
+
+function updateSummary(summary) {
+  getElement('socialBudget').textContent =
+    formatYen(
+      summary.socialBudget
     );
 
-    function switchScreen(name) {
-      const isSummary =
-        name === 'summary';
-
-      getElement('inputScreen')
-        .classList.toggle(
-          'active',
-          !isSummary
-        );
-
-      getElement('summaryScreen')
-        .classList.toggle(
-          'active',
-          isSummary
-        );
-
-      getElement('inputTab')
-        .classList.toggle(
-          'active',
-          !isSummary
-        );
-
-      getElement('summaryTab')
-        .classList.toggle(
-          'active',
-          isSummary
-        );
-
-      if (isSummary) {
-        callApi('summary')
-          .then(function(data) {
-            updateSummary(
-              data.summary || {}
-            );
-          })
-          .catch(handleError);
-      }
-    }
-
-    function callApi(action, params) {
-      params = params || {};
-
-      return new Promise(
-        function(resolve, reject) {
-          const callbackName =
-            'jsonpCallback_' +
-            Date.now() +
-            '_' +
-            Math.floor(
-              Math.random() * 100000
-            );
-
-          let finished = false;
-
-          const script =
-            document.createElement('script');
-
-          const timeoutId =
-            setTimeout(
-              function() {
-                finish(
-                  new Error(
-                    'Loading timed out.'
-                  )
-                );
-              },
-              15000
-            );
-
-          function cleanup() {
-            clearTimeout(timeoutId);
-            delete window[callbackName];
-
-            if (script.parentNode) {
-              script.parentNode
-                .removeChild(script);
-            }
-          }
-
-          function finish(error, data) {
-            if (finished) {
-              return;
-            }
-
-            finished = true;
-            cleanup();
-
-            if (error) {
-              reject(error);
-            } else {
-              resolve(data);
-            }
-          }
-
-          window[callbackName] =
-            function(data) {
-              if (
-                !data ||
-                data.success === false
-              ) {
-                finish(
-                  new Error(
-                    data && data.message
-                      ? data.message
-                      : 'API error.'
-                  )
-                );
-
-                return;
-              }
-
-              finish(null, data);
-            };
-
-          const query = [
-            'action=' +
-              encodeURIComponent(action),
-            'callback=' +
-              encodeURIComponent(
-                callbackName
-              )
-          ];
-
-          Object.keys(params)
-            .forEach(function(key) {
-              query.push(
-                encodeURIComponent(key) +
-                '=' +
-                encodeURIComponent(
-                  params[key]
-                )
-              );
-            });
-
-          script.src =
-            API_URL +
-            '?' +
-            query.join('&');
-
-          script.onerror =
-            function() {
-              finish(
-                new Error(
-                  'Could not connect to the API.'
-                )
-              );
-            };
-
-          document.body
-            .appendChild(script);
-        }
-      );
-    }
-
-    function handleInitialData(data) {
-      todayTextEl.textContent =
-        data.todayText || '';
-
-      sheetNameEl.textContent =
-        data.sheetName || '';
-
-      renderTabs(
-        categoryTabsEl,
-        data.categories || [],
-        'category'
-      );
-
-      renderTabs(
-        itemTabsEl,
-        data.items || [],
-        'item'
-      );
-
-      updateSummary(
-        data.summary || {}
-      );
-
-      loadingEl.style.display =
-        'none';
-
-      formEl.style.display =
-        'block';
-
-      hideStatus();
-    }
-
-    function renderTabs(
-      container,
-      options,
-      type
-    ) {
-      container.innerHTML = '';
-
-      if (!options.length) {
-        const empty =
-          document.createElement('div');
-
-        empty.className =
-          'empty-options';
-
-        empty.textContent =
-          type === 'category'
-            ? 'C21の入力規則に選択肢がありません。'
-            : 'D21の入力規則に選択肢がありません。';
-
-        container.appendChild(empty);
-        return;
-      }
-
-      options.forEach(
-        function(value, index) {
-          const button =
-            document.createElement(
-              'button'
-            );
-
-          button.type = 'button';
-          button.className =
-            'choice-button';
-
-          button.textContent = value;
-          button.dataset.value = value;
-
-          if (index === 0) {
-            button.classList.add(
-              'active'
-            );
-
-            if (type === 'category') {
-              selectedCategory = value;
-            } else {
-              selectedItem = value;
-            }
-          }
-
-          button.addEventListener(
-            'click',
-            function() {
-              const buttons =
-                container.querySelectorAll(
-                  '.choice-button'
-                );
-
-              buttons.forEach(
-                function(target) {
-                  target.classList.remove(
-                    'active'
-                  );
-                }
-              );
-
-              button.classList.add(
-                'active'
-              );
-
-              if (type === 'category') {
-                selectedCategory = value;
-              } else {
-                selectedItem = value;
-              }
-
-              button.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-              });
-            }
-          );
-
-          container.appendChild(
-            button
-          );
-        }
-      );
-    }
-
-    formEl.addEventListener(
-      'submit',
-      function(event) {
-        event.preventDefault();
-
-        if (!selectedCategory) {
-          showStatus(
-            'Please select a Category.',
-            'error'
-          );
-
-          return;
-        }
-
-        if (!selectedItem) {
-          showStatus(
-            'Please select an Item.',
-            'error'
-          );
-
-          return;
-        }
-
-        if (
-          !amountEl.value ||
-          Number(amountEl.value) <= 0
-        ) {
-          showStatus(
-            'Please enter an Amount.',
-            'error'
-          );
-
-          amountEl.focus();
-          return;
-        }
-
-        submitButton.disabled = true;
-        submitButton.textContent =
-          'Saving...';
-
-        showStatus(
-          'Saving...',
-          'info'
-        );
-
-        callApi('add', {
-          category: selectedCategory,
-          item: selectedItem,
-          amount: amountEl.value,
-          memo: memoEl.value
-        })
-          .then(handleSaved)
-          .catch(handleError);
-      }
+  getElement('socialRemaining').textContent =
+    formatYen(
+      summary.socialRemaining
     );
 
-    function handleSaved(result) {
-      showStatus(
-        'Saved.',
-        'success'
-      );
+  setBalance(
+    getElement('socialBalance'),
+    summary.socialBalance
+  );
 
-      if (navigator.vibrate) {
-        navigator.vibrate(80);
-      }
+  getElement('foodBudget').textContent =
+    formatYen(
+      summary.foodBudget
+    );
 
-      const saved =
-        result.saved || {};
+  getElement('foodRemaining').textContent =
+    formatYen(
+      summary.foodRemaining
+    );
 
-      lastEl.className =
-        'last show';
+  setBalance(
+    getElement('foodBalance'),
+    summary.foodBalance
+  );
 
-      lastEl.textContent =
-        'Last saved: ' +
-        (result.sheetName || '') +
-        ' / Row ' +
-        (result.row || '') +
-        ' — ' +
-        (saved.date || '') +
-        ' ' +
-        (
-          saved.category ||
-          'Card Payment'
-        ) +
-        ' ' +
-        (saved.item || '') +
-        ' ¥' +
-        Number(
-          saved.amount || 0
-        ).toLocaleString() +
-        (
-          saved.memo
-            ? ' ' + saved.memo
-            : ''
-        );
+  getElement('cardPayment').textContent =
+    formatYen(
+      summary.cardPayment
+    );
+}
 
-      updateSummary(
-        result.summary || {}
-      );
+function setBalance(element, value) {
+  const number =
+    Number(value || 0);
 
-      amountEl.value = '';
-      memoEl.value = '';
+  element.textContent =
+    (
+      number < 0
+        ? '-'
+        : ''
+    ) +
+    formatYen(
+      Math.abs(number)
+    );
 
-      submitButton.disabled = false;
-      submitButton.textContent =
-        'Save';
+  element.classList.toggle(
+    'minus',
+    number < 0
+  );
 
-      amountEl.focus();
-    }
+  element.classList.toggle(
+    'plus',
+    number >= 0
+  );
+}
 
-    function updateSummary(summary) {
-      getElement(
-        'socialBudget'
-      ).textContent =
-        formatYen(
-          summary.socialBudget
-        );
+function formatYen(value) {
+  return (
+    '¥' +
+    Number(
+      value || 0
+    ).toLocaleString()
+  );
+}
 
-      getElement(
-        'socialRemaining'
-      ).textContent =
-        formatYen(
-          summary.socialRemaining
-        );
+function showStatus(message, type) {
+  const status =
+    getElement('status');
 
-      setBalance(
-        getElement('socialBalance'),
-        summary.socialBalance
-      );
+  status.textContent = message;
+  status.className =
+    'status show ' + type;
+}
 
-      getElement(
-        'foodBudget'
-      ).textContent =
-        formatYen(
-          summary.foodBudget
-        );
+function hideStatus() {
+  const status =
+    getElement('status');
 
-      getElement(
-        'foodRemaining'
-      ).textContent =
-        formatYen(
-          summary.foodRemaining
-        );
+  status.textContent = '';
+  status.className = 'status';
+}
 
-      setBalance(
-        getElement('foodBalance'),
-        summary.foodBalance
-      );
+function handleError(error) {
+  getElement('loading').style.display =
+    'none';
 
-      getElement(
-        'cardPayment'
-      ).textContent =
-        formatYen(
-          summary.cardPayment
-        );
-    }
+  showStatus(
+    error.message ||
+      String(error),
+    'error'
+  );
 
-    function setBalance(
-      element,
-      value
-    ) {
-      const number =
-        Number(value || 0);
+  const submitButton =
+    getElement('submitButton');
 
-      element.textContent =
-        (
-          number < 0
-            ? '-'
-            : ''
-        ) +
-        formatYen(
-          Math.abs(number)
-        );
-
-      element.classList.toggle(
-        'minus',
-        number < 0
-      );
-
-      element.classList.toggle(
-        'plus',
-        number >= 0
-      );
-    }
-
-    function formatYen(value) {
-      return (
-        '¥' +
-        Number(
-          value || 0
-        ).toLocaleString()
-      );
-    }
-
-    function showStatus(
-      message,
-      type
-    ) {
-      statusEl.textContent =
-        message;
-
-      statusEl.className =
-        'status show ' + type;
-    }
-
-    function hideStatus() {
-      statusEl.textContent = '';
-      statusEl.className =
-        'status';
-    }
-
-    function handleError(error) {
-      loadingEl.style.display =
-        'none';
-
-      showStatus(
-        error.message ||
-          String(error),
-        'error'
-      );
-
-      submitButton.disabled = false;
-      submitButton.textContent =
-        'Save';
-    }
-  </script>
+  submitButton.disabled = false;
+  submitButton.textContent = 'Save';
+}
+</script>
 </body>
 </html>
