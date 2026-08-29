@@ -2,13 +2,18 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Money Log</title>
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<title>Money Log House</title>
 
 <style>
 :root {
   --bg: #f5f7f8;
-  --card: #fff;
+  --card: #ffffff;
   --text: #1f2933;
   --sub: #6b7280;
   --border: #d9dee3;
@@ -26,7 +31,11 @@ body {
   padding: 16px 16px 96px;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .app {
@@ -114,7 +123,6 @@ h1 {
   font-weight: 800;
 }
 
-/* Category・Itemの縦スクロールメニュー */
 .dropdown {
   position: relative;
 }
@@ -127,7 +135,7 @@ h1 {
   min-height: 50px;
   padding: 0 14px;
   color: var(--text);
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 14px;
   font-size: 16px;
@@ -138,16 +146,20 @@ h1 {
 
 .dropdown-toggle.open {
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.13);
+  box-shadow:
+    0 0 0 3px
+    rgba(22, 163, 74, 0.13);
 }
 
 .dropdown-arrow {
   color: var(--sub);
   font-size: 15px;
-  transition: transform 0.15s;
+  transition:
+    transform 0.15s;
 }
 
-.dropdown-toggle.open .dropdown-arrow {
+.dropdown-toggle.open
+.dropdown-arrow {
   transform: rotate(180deg);
 }
 
@@ -161,10 +173,12 @@ h1 {
   max-height: 280px;
   overflow-y: auto;
   padding: 8px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 14px;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+  box-shadow:
+    0 14px 32px
+    rgba(0, 0, 0, 0.16);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -178,7 +192,7 @@ h1 {
   min-height: 46px;
   padding: 11px 12px;
   color: var(--text);
-  background: #fff;
+  background: #ffffff;
   border: 0;
   border-radius: 10px;
   font-size: 16px;
@@ -186,7 +200,8 @@ h1 {
   cursor: pointer;
 }
 
-.dropdown-option + .dropdown-option {
+.dropdown-option
++ .dropdown-option {
   margin-top: 2px;
 }
 
@@ -213,7 +228,7 @@ textarea {
   width: 100%;
   padding: 14px 12px;
   color: var(--text);
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 14px;
   font-size: 18px;
@@ -223,7 +238,9 @@ textarea {
 input:focus,
 textarea:focus {
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.13);
+  box-shadow:
+    0 0 0 3px
+    rgba(22, 163, 74, 0.13);
 }
 
 textarea {
@@ -240,7 +257,8 @@ textarea {
   top: 50%;
   left: 14px;
   color: var(--sub);
-  transform: translateY(-50%);
+  transform:
+    translateY(-50%);
 }
 
 #amount {
@@ -252,18 +270,21 @@ textarea {
   width: 100%;
   min-height: 56px;
   margin-top: 20px;
-  color: #fff;
-  background: linear-gradient(
-    135deg,
-    #16a34a,
-    #22c55e 45%,
-    #14b8a6
-  );
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #16a34a,
+      #22c55e 45%,
+      #14b8a6
+    );
   border: 0;
   border-radius: 16px;
   font-size: 20px;
   font-weight: 900;
-  box-shadow: 0 14px 28px rgba(34, 197, 94, 0.25);
+  box-shadow:
+    0 14px 28px
+    rgba(34, 197, 94, 0.25);
   cursor: pointer;
 }
 
@@ -290,13 +311,15 @@ textarea {
 
 .summary-item {
   padding: 16px;
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
   border-radius: 16px;
 }
 
 .summary-top {
   display: flex;
-  justify-content: space-between;
+  justify-content:
+    space-between;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 6px;
@@ -347,15 +370,21 @@ textarea {
   padding:
     10px
     16px
-    calc(10px + env(safe-area-inset-bottom));
-  background: rgba(245, 247, 248, 0.94);
-  border-top: 1px solid var(--border);
+    calc(
+      10px +
+      env(safe-area-inset-bottom)
+    );
+  background:
+    rgba(245, 247, 248, 0.94);
+  border-top:
+    1px solid var(--border);
   backdrop-filter: blur(12px);
 }
 
 .tab-inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns:
+    1fr 1fr;
   gap: 8px;
   max-width: 480px;
   margin: auto;
@@ -376,8 +405,10 @@ textarea {
 
 .tab-button.active {
   color: var(--text);
-  background: #fff;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow:
+    0 3px 10px
+    rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 520px) {
@@ -385,7 +416,10 @@ textarea {
     padding:
       12px
       12px
-      calc(92px + env(safe-area-inset-bottom));
+      calc(
+        92px +
+        env(safe-area-inset-bottom)
+      );
   }
 
   h1 {
@@ -420,27 +454,45 @@ textarea {
     <div class="meta">
       <div>
         Date:
-        <span id="todayText">Loading...</span>
+        <span id="todayText">
+          Loading...
+        </span>
       </div>
 
       <div>
         Sheet:
-        <span id="sheetName">Loading...</span>
+        <span id="sheetName">
+          Loading...
+        </span>
       </div>
     </div>
   </header>
 
-  <section id="inputScreen" class="screen active">
+  <section
+    id="inputScreen"
+    class="screen active"
+  >
     <div class="card">
-      <h2 class="section-title">Log Entry</h2>
+      <h2 class="section-title">
+        Log Entry
+      </h2>
 
-      <div id="status" class="status"></div>
+      <div
+        id="status"
+        class="status"
+      ></div>
 
-      <div id="loading" class="loading">
+      <div
+        id="loading"
+        class="loading"
+      >
         Loading...
       </div>
 
-      <form id="form" style="display:none">
+      <form
+        id="form"
+        style="display:none"
+      >
         <label class="field-label">
           Category
         </label>
@@ -493,7 +545,10 @@ textarea {
           ></div>
         </div>
 
-        <label class="field-label" for="amount">
+        <label
+          class="field-label"
+          for="amount"
+        >
           Amount
         </label>
 
@@ -510,7 +565,10 @@ textarea {
           >
         </div>
 
-        <label class="field-label" for="memo">
+        <label
+          class="field-label"
+          for="memo"
+        >
           Memo
         </label>
 
@@ -528,11 +586,17 @@ textarea {
         </button>
       </form>
 
-      <div id="last" class="last"></div>
+      <div
+        id="last"
+        class="last"
+      ></div>
     </div>
   </section>
 
-  <section id="summaryScreen" class="screen">
+  <section
+    id="summaryScreen"
+    class="screen"
+  >
     <div class="card">
       <h2 class="section-title">
         Monthly Snapshot
@@ -649,47 +713,58 @@ const getElement = function(id) {
 let selectedCategory = '';
 let selectedItem = '';
 
-window.addEventListener('load', function() {
-  showStatus('Loading data...', 'info');
-
-  callApi('init')
-    .then(initializeApp)
-    .catch(handleError);
-});
-
-getElement('inputTab').addEventListener(
-  'click',
+window.addEventListener(
+  'load',
   function() {
-    switchScreen(false);
+    showStatus(
+      'Loading data...',
+      'info'
+    );
+
+    callApi('init')
+      .then(initializeApp)
+      .catch(handleError);
   }
 );
 
-getElement('summaryTab').addEventListener(
+getElement('inputTab')
+  .addEventListener(
+    'click',
+    function() {
+      switchScreen(false);
+    }
+  );
+
+getElement('summaryTab')
+  .addEventListener(
+    'click',
+    function() {
+      switchScreen(true);
+    }
+  );
+
+getElement('categoryToggle')
+  .addEventListener(
+    'click',
+    function(event) {
+      event.stopPropagation();
+      toggleMenu('category');
+    }
+  );
+
+getElement('itemToggle')
+  .addEventListener(
+    'click',
+    function(event) {
+      event.stopPropagation();
+      toggleMenu('item');
+    }
+  );
+
+document.addEventListener(
   'click',
-  function() {
-    switchScreen(true);
-  }
+  closeMenus
 );
-
-getElement('categoryToggle').addEventListener(
-  'click',
-  function(event) {
-    event.stopPropagation();
-    toggleMenu('category');
-  }
-);
-
-getElement('itemToggle').addEventListener(
-  'click',
-  function(event) {
-    event.stopPropagation();
-    toggleMenu('item');
-  }
-);
-
-document.addEventListener('click', function() {
-  closeMenus();
-});
 
 function toggleMenu(type) {
   const menu =
@@ -699,7 +774,9 @@ function toggleMenu(type) {
     getElement(type + 'Toggle');
 
   const willOpen =
-    !menu.classList.contains('open');
+    !menu.classList.contains(
+      'open'
+    );
 
   closeMenus();
 
@@ -715,8 +792,8 @@ function toggleMenu(type) {
 }
 
 function closeMenus() {
-  ['category', 'item'].forEach(
-    function(type) {
+  ['category', 'item']
+    .forEach(function(type) {
       const menu =
         getElement(type + 'Menu');
 
@@ -730,8 +807,7 @@ function closeMenus() {
         'aria-expanded',
         'false'
       );
-    }
-  );
+    });
 }
 
 function switchScreen(isSummary) {
@@ -786,7 +862,9 @@ function callApi(action, params) {
         );
 
       const script =
-        document.createElement('script');
+        document.createElement(
+          'script'
+        );
 
       let finished = false;
 
@@ -804,7 +882,10 @@ function callApi(action, params) {
 
       function cleanup() {
         clearTimeout(timeoutId);
-        delete window[callbackName];
+
+        delete window[
+          callbackName
+        ];
 
         if (script.parentNode) {
           script.parentNode
@@ -812,7 +893,10 @@ function callApi(action, params) {
         }
       }
 
-      function finish(error, data) {
+      function finish(
+        error,
+        data
+      ) {
         if (finished) {
           return;
         }
@@ -835,7 +919,8 @@ function callApi(action, params) {
           ) {
             finish(
               new Error(
-                data && data.message
+                data &&
+                data.message
                   ? data.message
                   : 'API error.'
               )
@@ -849,15 +934,18 @@ function callApi(action, params) {
 
       const query = [
         'action=' +
-          encodeURIComponent(action),
+          encodeURIComponent(
+            action
+          ),
+
         'callback=' +
           encodeURIComponent(
             callbackName
           )
       ];
 
-      Object.keys(params).forEach(
-        function(key) {
+      Object.keys(params)
+        .forEach(function(key) {
           query.push(
             encodeURIComponent(key) +
             '=' +
@@ -865,33 +953,36 @@ function callApi(action, params) {
               params[key]
             )
           );
-        }
-      );
+        });
 
       script.src =
         API_URL +
         '?' +
         query.join('&');
 
-      script.onerror = function() {
-        finish(
-          new Error(
-            'Could not connect to the API.'
-          )
-        );
-      };
+      script.onerror =
+        function() {
+          finish(
+            new Error(
+              'Could not connect to the API.'
+            )
+          );
+        };
 
-      document.body.appendChild(script);
+      document.body
+        .appendChild(script);
     }
   );
 }
 
 function initializeApp(data) {
-  getElement('todayText').textContent =
-    data.todayText || '';
+  getElement('todayText')
+    .textContent =
+      data.todayText || '';
 
-  getElement('sheetName').textContent =
-    data.sheetName || '';
+  getElement('sheetName')
+    .textContent =
+      data.sheetName || '';
 
   renderMenu(
     'category',
@@ -907,16 +998,19 @@ function initializeApp(data) {
     data.summary || {}
   );
 
-  getElement('loading').style.display =
-    'none';
+  getElement('loading')
+    .style.display = 'none';
 
-  getElement('form').style.display =
-    'block';
+  getElement('form')
+    .style.display = 'block';
 
   hideStatus();
 }
 
-function renderMenu(type, options) {
+function renderMenu(
+  type,
+  options
+) {
   const menu =
     getElement(type + 'Menu');
 
@@ -927,13 +1021,17 @@ function renderMenu(type, options) {
 
   if (!options.length) {
     const empty =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     empty.className =
       'empty-options';
 
     empty.textContent =
-      'No options found.';
+      type === 'category'
+        ? 'C21の入力規則に選択肢がありません。'
+        : 'D21の入力規則に選択肢がありません。';
 
     menu.appendChild(empty);
     return;
@@ -942,25 +1040,34 @@ function renderMenu(type, options) {
   options.forEach(
     function(value, index) {
       const button =
-        document.createElement('button');
+        document.createElement(
+          'button'
+        );
 
       button.type = 'button';
+
       button.className =
         'dropdown-option';
 
-      button.textContent = value;
+      button.textContent =
+        value;
 
       if (index === 0) {
         button.classList.add(
           'selected'
         );
 
-        label.textContent = value;
+        label.textContent =
+          value;
 
-        if (type === 'category') {
-          selectedCategory = value;
+        if (
+          type === 'category'
+        ) {
+          selectedCategory =
+            value;
         } else {
-          selectedItem = value;
+          selectedItem =
+            value;
         }
       }
 
@@ -986,12 +1093,17 @@ function renderMenu(type, options) {
             'selected'
           );
 
-          label.textContent = value;
+          label.textContent =
+            value;
 
-          if (type === 'category') {
-            selectedCategory = value;
+          if (
+            type === 'category'
+          ) {
+            selectedCategory =
+              value;
           } else {
-            selectedItem = value;
+            selectedItem =
+              value;
           }
 
           closeMenus();
@@ -1003,70 +1115,86 @@ function renderMenu(type, options) {
   );
 }
 
-getElement('form').addEventListener(
-  'submit',
-  function(event) {
-    event.preventDefault();
+getElement('form')
+  .addEventListener(
+    'submit',
+    function(event) {
+      event.preventDefault();
 
-    const amount =
-      getElement('amount').value;
+      const amount =
+        getElement('amount')
+          .value;
 
-    const memo =
-      getElement('memo').value;
+      const memo =
+        getElement('memo')
+          .value;
 
-    if (!selectedCategory) {
+      if (!selectedCategory) {
+        showStatus(
+          'Please select a Category.',
+          'error'
+        );
+
+        return;
+      }
+
+      if (!selectedItem) {
+        showStatus(
+          'Please select an Item.',
+          'error'
+        );
+
+        return;
+      }
+
+      if (
+        !amount ||
+        Number(amount) <= 0
+      ) {
+        showStatus(
+          'Please enter an Amount.',
+          'error'
+        );
+
+        getElement('amount')
+          .focus();
+
+        return;
+      }
+
+      const submitButton =
+        getElement(
+          'submitButton'
+        );
+
+      submitButton.disabled =
+        true;
+
+      submitButton.textContent =
+        'Saving...';
+
       showStatus(
-        'Please select a Category.',
-        'error'
+        'Saving...',
+        'info'
       );
 
-      return;
+      callApi('add', {
+        category:
+          selectedCategory,
+
+        item:
+          selectedItem,
+
+        amount:
+          amount,
+
+        memo:
+          memo
+      })
+        .then(handleSaved)
+        .catch(handleError);
     }
-
-    if (!selectedItem) {
-      showStatus(
-        'Please select an Item.',
-        'error'
-      );
-
-      return;
-    }
-
-    if (
-      !amount ||
-      Number(amount) <= 0
-    ) {
-      showStatus(
-        'Please enter an Amount.',
-        'error'
-      );
-
-      getElement('amount').focus();
-      return;
-    }
-
-    const submitButton =
-      getElement('submitButton');
-
-    submitButton.disabled = true;
-    submitButton.textContent =
-      'Saving...';
-
-    showStatus(
-      'Saving...',
-      'info'
-    );
-
-    callApi('add', {
-      category: selectedCategory,
-      item: selectedItem,
-      amount: amount,
-      memo: memo
-    })
-      .then(handleSaved)
-      .catch(handleError);
-  }
-);
+  );
 
 function handleSaved(result) {
   showStatus(
@@ -1115,56 +1243,84 @@ function handleSaved(result) {
     result.summary || {}
   );
 
-  getElement('amount').value = '';
-  getElement('memo').value = '';
+  getElement('amount')
+    .value = '';
+
+  getElement('memo')
+    .value = '';
 
   const submitButton =
-    getElement('submitButton');
+    getElement(
+      'submitButton'
+    );
 
-  submitButton.disabled = false;
-  submitButton.textContent = 'Save';
+  submitButton.disabled =
+    false;
 
-  getElement('amount').focus();
+  submitButton.textContent =
+    'Save';
+
+  getElement('amount')
+    .focus();
 }
 
-function updateSummary(summary) {
-  getElement('socialBudget').textContent =
+function updateSummary(
+  summary
+) {
+  getElement(
+    'socialBudget'
+  ).textContent =
     formatYen(
       summary.socialBudget
     );
 
-  getElement('socialRemaining').textContent =
+  getElement(
+    'socialRemaining'
+  ).textContent =
     formatYen(
       summary.socialRemaining
     );
 
   setBalance(
-    getElement('socialBalance'),
+    getElement(
+      'socialBalance'
+    ),
     summary.socialBalance
   );
 
-  getElement('foodBudget').textContent =
+  getElement(
+    'foodBudget'
+  ).textContent =
     formatYen(
       summary.foodBudget
     );
 
-  getElement('foodRemaining').textContent =
+  getElement(
+    'foodRemaining'
+  ).textContent =
     formatYen(
       summary.foodRemaining
     );
 
   setBalance(
-    getElement('foodBalance'),
+    getElement(
+      'foodBalance'
+    ),
     summary.foodBalance
   );
 
-  getElement('cardPayment').textContent =
+  getElement(
+    'cardPayment'
+  ).textContent =
     formatYen(
       summary.cardPayment
     );
 }
 
-function setBalance(element, value) {
+function setBalance(
+  element,
+  value
+) {
   const number =
     Number(value || 0);
 
@@ -1198,11 +1354,16 @@ function formatYen(value) {
   );
 }
 
-function showStatus(message, type) {
+function showStatus(
+  message,
+  type
+) {
   const status =
     getElement('status');
 
-  status.textContent = message;
+  status.textContent =
+    message;
+
   status.className =
     'status show ' + type;
 }
@@ -1212,12 +1373,13 @@ function hideStatus() {
     getElement('status');
 
   status.textContent = '';
-  status.className = 'status';
+  status.className =
+    'status';
 }
 
 function handleError(error) {
-  getElement('loading').style.display =
-    'none';
+  getElement('loading')
+    .style.display = 'none';
 
   showStatus(
     error.message ||
@@ -1226,10 +1388,15 @@ function handleError(error) {
   );
 
   const submitButton =
-    getElement('submitButton');
+    getElement(
+      'submitButton'
+    );
 
-  submitButton.disabled = false;
-  submitButton.textContent = 'Save';
+  submitButton.disabled =
+    false;
+
+  submitButton.textContent =
+    'Save';
 }
 </script>
 </body>
