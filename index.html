@@ -2,515 +2,1188 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>共通家計簿 | Household Log</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <title>Money Log</title>
+
   <style>
-    button, input, select { -webkit-tap-highlight-color: transparent; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    :root {
+      --bg: #f5f7f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --sub: #6b7280;
+      --border: #d9dee3;
+      --green: #0f9d58;
+      --red: #d93025;
+      --blue: #1a73e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px 16px 96px;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .meta {
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .card {
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid #e6e5e3;
+      border-radius: 16px;
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.05),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .status {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.info {
+      color: var(--blue);
+      background: #e5f2fc;
+    }
+
+    .status.success {
+      color: #267a4c;
+      background: #e8f1ec;
+    }
+
+    .status.error {
+      color: var(--red);
+      background: #fce9e7;
+    }
+
+    .loading {
+      padding: 24px;
+      color: var(--sub);
+      text-align: center;
+    }
+
+    .field-label {
+      display: block;
+      margin: 16px 0 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .choice-scroll {
+      overflow-x: auto;
+      padding: 2px 2px 8px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .choice-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .choice-tabs {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .choice-button {
+      flex: none;
+      min-height: 44px;
+      padding: 10px 15px;
+      color: var(--sub);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .choice-button.active {
+      color: #ffffff;
+      background:
+        linear-gradient(
+          135deg,
+          #16a34a,
+          #22c55e 50%,
+          #14b8a6
+        );
+      border-color: transparent;
+      box-shadow:
+        0 7px 16px rgba(34, 197, 94, 0.24);
+    }
+
+    .empty-options {
+      padding: 12px;
+      color: var(--sub);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px 12px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      outline: none;
+      font-size: 18px;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow:
+        0 0 0 3px rgba(15, 157, 88, 0.14);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .amount-box {
+      position: relative;
+    }
+
+    .yen {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      color: var(--sub);
+      transform: translateY(-50%);
+    }
+
+    #amount {
+      padding-left: 36px;
+      font-weight: 800;
+    }
+
+    .submit {
+      width: 100%;
+      min-height: 56px;
+      margin-top: 20px;
+      color: #ffffff;
+      background:
+        linear-gradient(
+          135deg,
+          #16a34a,
+          #22c55e 45%,
+          #14b8a6
+        );
+      border: 0;
+      border-radius: 16px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow:
+        0 14px 28px rgba(34, 197, 94, 0.25);
+    }
+
+    .submit:disabled {
+      opacity: 0.6;
+    }
+
+    .last {
+      display: none;
+      margin-top: 12px;
+      color: var(--sub);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .last.show {
+      display: block;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-item {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .summary-label {
+      color: var(--sub);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .summary-right {
+      text-align: right;
+    }
+
+    .summary-budget {
+      color: var(--sub);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .summary-balance {
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .summary-balance.plus {
+      color: var(--blue);
+    }
+
+    .summary-balance.minus {
+      color: var(--red);
+    }
+
+    .summary-value {
+      font-size: 34px;
+      font-weight: 760;
+      letter-spacing: -0.025em;
+    }
+
+    .tabs {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding:
+        10px
+        16px
+        calc(10px + env(safe-area-inset-bottom));
+      background: rgba(245, 247, 248, 0.94);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .tab-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 5px;
+      background: #e9edf2;
+      border-radius: 16px;
+    }
+
+    .tab-button {
+      min-height: 44px;
+      color: var(--sub);
+      background: transparent;
+      border: 0;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      color: var(--text);
+      background: #ffffff;
+      box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding:
+          12px
+          12px
+          calc(92px + env(safe-area-inset-bottom));
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      input,
+      textarea {
+        font-size: 16px;
+      }
+
+      .summary-value {
+        font-size: 30px;
+      }
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased select-none">
 
-  <!-- ヘッダー -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
-    <div>
-      <p class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Household Log</p>
-      <h1 class="text-base font-bold text-white flex items-center gap-1.5">
-        <span>💳</span> 共通家計簿
-        <span id="labelMonth" class="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">読込中...</span>
-      </h1>
-    </div>
-    <button id="btnRefresh" onclick="fetchSummary()" class="p-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-slate-300 text-xs flex items-center gap-1">
-      🔄 <span>更新</span>
-    </button>
-  </header>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Money Log</h1>
 
-  <!-- トースト通知 -->
-  <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-slate-950 px-4 py-2 rounded-full font-bold text-xs shadow-lg transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2">
-    ✅ スプシに保存しました！
-  </div>
-
-  <!-- エラーバナー -->
-  <div id="errorBanner" class="hidden mx-4 mt-2 bg-rose-950/80 border border-rose-800 rounded-xl p-3 text-xs text-rose-300">
-    <div class="font-bold flex items-center gap-1.5 mb-0.5">⚠️ 通信エラー</div>
-    <p class="text-[11px] text-rose-300/80" id="errorMessageText">データの取得に失敗しました</p>
-  </div>
-
-  <!-- メイン画面（2画面カルーセル） -->
-  <div class="flex-1 overflow-hidden relative">
-    <div id="screensWrapper" class="flex h-full w-[200%] transition-transform duration-300 ease-out">
-      
-      <!-- ================= 画面 1: ホーム（残予算 ＋ 口座 ＋ 入力） ================= -->
-      <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
-        <div class="max-w-md mx-auto space-y-3">
-          
-          <!-- 1. 口座・カード・立替・資産運用カード（2列×3行） -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg space-y-2">
-            <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-1.5">
-              <span class="flex items-center gap-1">🏦 口座・カード・立替</span>
-              <span class="text-[10px] text-slate-500 font-normal">スプシ連動</span>
-            </div>
-            
-            <!-- 口座 2つ -->
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">共通口座</div>
-                <div id="valCommonAccount" class="text-sm font-bold text-emerald-400 mt-0.5">¥---,---</div>
-              </div>
-              <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">SBI新生銀行</div>
-                <div id="valSbiAccount" class="text-sm font-bold text-slate-200 mt-0.5">¥---,---</div>
-              </div>
-            </div>
-
-            <!-- 資産運用 ＆ カード（今月利用） -->
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">📈 資産運用</div>
-                <div id="valAssetAccount" class="text-sm font-bold text-amber-300 mt-0.5">¥---,---</div>
-              </div>
-              <div class="bg-slate-800/60 rounded-xl p-2.5 border border-sky-500/20">
-                <div class="text-slate-400 text-[11px] flex items-center justify-between">
-                  <span>来月カード</span>
-                  <span class="text-[9px] text-sky-400 font-mono">今月利用</span>
-                </div>
-                <div id="valNextCard" class="text-sm font-bold text-sky-300 mt-0.5">¥---</div>
-              </div>
-            </div>
-
-            <!-- 立替 2つ -->
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">🙋‍♂️ おぐら立替</div>
-                <div id="valOguraTatekae" class="text-sm font-bold text-indigo-300 mt-0.5">¥---</div>
-              </div>
-              <div class="bg-slate-800/60 rounded-xl p-2.5">
-                <div class="text-slate-400 text-[11px]">🙋‍♀️ もんま立替</div>
-                <div id="valMonmaTatekae" class="text-sm font-bold text-pink-300 mt-0.5">¥---</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. 食材費・日用品 分割予算メーター -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3.5">
-            
-            <!-- 食材費メーター -->
-            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-800">
-              <div class="flex justify-between items-baseline mb-1">
-                <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <span>🛒</span> 食材費
-                </span>
-                <div class="text-right">
-                  <span class="text-[11px] text-slate-400">あと</span>
-                  <span id="valFoodRemaining" class="text-lg font-extrabold text-sky-400 ml-1">¥---</span>
-                </div>
-              </div>
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div id="foodBar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-              </div>
-              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>利用: <strong id="valFoodSpent" class="text-slate-200">¥0</strong></span>
-                <span>予算: <strong id="valFoodBudget" class="text-slate-200">¥30,000</strong> (<span id="valFoodPercent">0%</span>)</span>
-              </div>
-            </div>
-
-            <!-- 日用品メーター -->
-            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-800">
-              <div class="flex justify-between items-baseline mb-1">
-                <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <span>🧻</span> 日用品
-                </span>
-                <div class="text-right">
-                  <span class="text-[11px] text-slate-400">あと</span>
-                  <span id="valDailyRemaining" class="text-lg font-extrabold text-emerald-400 ml-1">¥---</span>
-                </div>
-              </div>
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div id="dailyBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-              </div>
-              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>利用: <strong id="valDailySpent" class="text-slate-200">¥0</strong></span>
-                <span>予算: <strong id="valDailyBudget" class="text-slate-200">¥7,000</strong> (<span id="valDailyPercent">0%</span>)</span>
-              </div>
-            </div>
-
-            <!-- 変動費全体 -->
-            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <div>
-                <span class="text-slate-400">変動費 残高計:</span>
-                <strong id="valTotalRemaining" class="text-slate-200 ml-1">¥---</strong>
-              </div>
-              <div>
-                <span class="text-slate-400">1日の目安:</span>
-                <strong id="valDailyAllowance" class="text-sky-400 ml-1">約 ¥- /日</strong>
-                <span id="valRemainingDays" class="text-[10px] text-slate-500 ml-1">(残--日)</span>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- 3. 支出入力フォーム -->
-          <form id="expenseForm" onsubmit="submitExpense(event)" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <span>✍️</span> 支出を記録
-            </h2>
-
-            <!-- 金額入力 -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">金額 (円)</label>
-              <div class="relative">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">¥</span>
-                <input type="number" id="inputAmount" required inputmode="numeric" placeholder="1500" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-4 py-3 text-2xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition">
-              </div>
-            </div>
-
-            <!-- 費目（Item）チップ選択 -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">費目 (Item)</label>
-              <div class="grid grid-cols-3 gap-1.5" id="itemChips">
-                <button type="button" onclick="setItem('食材費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300">🛒 食材費</button>
-                <button type="button" onclick="setItem('日用品')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🧻 日用品</button>
-                <button type="button" onclick="setItem('ガソリン代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">⛽ ガソリン代</button>
-                <button type="button" onclick="setItem('光熱費')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">💡 光熱費</button>
-                <button type="button" onclick="setItem('ネット代')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">📶 ネット代</button>
-                <button type="button" onclick="setItem('ローン')" class="item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300">🏦 ローン</button>
-              </div>
-              <input type="hidden" id="inputItem" value="食材費">
-            </div>
-
-            <!-- 支払区分（Category） ＆ メモ -->
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">支払区分 (Category)</label>
-                <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-                  <option value="">💳 カード払い (空白)</option>
-                  <option value="支出・共通">支出・共通</option>
-                  <option value="おぐら立替">おぐら立替</option>
-                  <option value="もんま立替">もんま立替</option>
-                  <option value="支出・もんま">支出・もんま</option>
-                  <option value="支出・SBI新生銀行">支出・SBI新生銀行</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">メモ (店名・担当など)</label>
-                <input type="text" id="inputMemo" placeholder="ベルクス、せき等" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500">
-              </div>
-            </div>
-
-            <!-- 保存ボタン -->
-            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 active:scale-[0.99] font-bold text-white rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-              <span>スプシに保存</span>
-            </button>
-          </form>
-
+      <div class="meta">
+        <div>
+          Date:
+          <span id="todayText">Loading...</span>
         </div>
-      </section>
 
-      <!-- ================= 画面 2: 履歴一覧 ================= -->
-      <section class="w-screen flex-shrink-0 px-4 pt-3 pb-24 overflow-y-auto no-scrollbar">
-        <div class="max-w-md mx-auto space-y-3">
-          
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
-              <span>最近の入力明細</span>
-              <span class="text-[10px] text-slate-500 font-normal">新しい順</span>
-            </h2>
-            <div id="logList" class="space-y-2 text-xs">
-              <div class="text-center py-6 text-slate-500">読み込み中...</div>
+        <div>
+          Sheet:
+          <span id="sheetName">Loading...</span>
+        </div>
+      </div>
+    </header>
+
+    <section
+      id="inputScreen"
+      class="screen active"
+    >
+      <div class="card">
+        <h2 class="section-title">
+          Log Entry
+        </h2>
+
+        <div
+          id="status"
+          class="status"
+        ></div>
+
+        <div
+          id="loading"
+          class="loading"
+        >
+          Loading...
+        </div>
+
+        <form
+          id="form"
+          style="display:none"
+        >
+          <div class="field-label">
+            Category
+          </div>
+
+          <div class="choice-scroll">
+            <div
+              id="categoryTabs"
+              class="choice-tabs"
+            ></div>
+          </div>
+
+          <div class="field-label">
+            Item
+          </div>
+
+          <div class="choice-scroll">
+            <div
+              id="itemTabs"
+              class="choice-tabs"
+            ></div>
+          </div>
+
+          <label
+            class="field-label"
+            for="amount"
+          >
+            Amount
+          </label>
+
+          <div class="amount-box">
+            <span class="yen">¥</span>
+
+            <input
+              id="amount"
+              type="number"
+              inputmode="numeric"
+              min="1"
+              placeholder="Amount"
+              required
+            >
+          </div>
+
+          <label
+            class="field-label"
+            for="memo"
+          >
+            Memo
+          </label>
+
+          <textarea
+            id="memo"
+            placeholder="Optional note"
+          ></textarea>
+
+          <button
+            id="submitButton"
+            class="submit"
+            type="submit"
+          >
+            Save
+          </button>
+        </form>
+
+        <div
+          id="last"
+          class="last"
+        ></div>
+      </div>
+    </section>
+
+    <section
+      id="summaryScreen"
+      class="screen"
+    >
+      <div class="card">
+        <h2 class="section-title">
+          Monthly Snapshot
+        </h2>
+
+        <div class="summary-list">
+          <div class="summary-item">
+            <div class="summary-top">
+              <div class="summary-label">
+                Social
+              </div>
+
+              <div class="summary-right">
+                <div
+                  id="socialBudget"
+                  class="summary-budget"
+                >
+                  ¥0
+                </div>
+
+                <div
+                  id="socialBalance"
+                  class="summary-balance plus"
+                >
+                  ¥0
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="socialRemaining"
+              class="summary-value"
+            >
+              ¥0
             </div>
           </div>
 
-        </div>
-      </section>
+          <div class="summary-item">
+            <div class="summary-top">
+              <div class="summary-label">
+                Food
+              </div>
 
-    </div>
+              <div class="summary-right">
+                <div
+                  id="foodBudget"
+                  class="summary-budget"
+                >
+                  ¥0
+                </div>
+
+                <div
+                  id="foodBalance"
+                  class="summary-balance plus"
+                >
+                  ¥0
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="foodRemaining"
+              class="summary-value"
+            >
+              ¥0
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-top">
+              <div class="summary-label">
+                Card Payment
+              </div>
+            </div>
+
+            <div
+              id="cardPayment"
+              class="summary-value"
+            >
+              ¥0
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <!-- 下部固定タブバー -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur border-t border-slate-800 py-2 px-12">
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
-      
-      <button onclick="switchTab(0)" id="tabBtn0" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-sky-400 font-bold transition scale-105">
-        <span class="text-xl">🏠</span>
-        <span class="text-[11px] font-bold mt-0.5">ホーム</span>
+  <nav class="tabs">
+    <div class="tab-inner">
+      <button
+        id="inputTab"
+        class="tab-button active"
+        type="button"
+      >
+        Log
       </button>
 
-      <button onclick="switchTab(1)" id="tabBtn1" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-slate-500 hover:text-slate-300 transition">
-        <span class="text-xl">📋</span>
-        <span class="text-[11px] font-bold mt-0.5">履歴</span>
+      <button
+        id="summaryTab"
+        class="tab-button"
+        type="button"
+      >
+        Summary
       </button>
-
     </div>
   </nav>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec";
+    const API_URL =
+      'https://script.google.com/macros/s/AKfycbxGe9RSpDwmY_crff6OGwvI4AxSQIxD7Abl7t7HBFLHhFI1bqTTPZLZD58Ab_Yu4cQ/exec';
 
-    let currentTabIndex = 0;
+    const getElement = function(id) {
+      return document.getElementById(id);
+    };
 
-    function setText(id, text) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = text;
+    const todayTextEl =
+      getElement('todayText');
+
+    const sheetNameEl =
+      getElement('sheetName');
+
+    const statusEl =
+      getElement('status');
+
+    const loadingEl =
+      getElement('loading');
+
+    const formEl =
+      getElement('form');
+
+    const categoryTabsEl =
+      getElement('categoryTabs');
+
+    const itemTabsEl =
+      getElement('itemTabs');
+
+    const amountEl =
+      getElement('amount');
+
+    const memoEl =
+      getElement('memo');
+
+    const submitButton =
+      getElement('submitButton');
+
+    const lastEl =
+      getElement('last');
+
+    let selectedCategory = '';
+    let selectedItem = '';
+
+    window.addEventListener(
+      'load',
+      function() {
+        showStatus(
+          'Loading data...',
+          'info'
+        );
+
+        callApi('init')
+          .then(handleInitialData)
+          .catch(handleError);
+      }
+    );
+
+    getElement('inputTab').addEventListener(
+      'click',
+      function() {
+        switchScreen('input');
+      }
+    );
+
+    getElement('summaryTab').addEventListener(
+      'click',
+      function() {
+        switchScreen('summary');
+      }
+    );
+
+    function switchScreen(name) {
+      const isSummary =
+        name === 'summary';
+
+      getElement('inputScreen')
+        .classList.toggle(
+          'active',
+          !isSummary
+        );
+
+      getElement('summaryScreen')
+        .classList.toggle(
+          'active',
+          isSummary
+        );
+
+      getElement('inputTab')
+        .classList.toggle(
+          'active',
+          !isSummary
+        );
+
+      getElement('summaryTab')
+        .classList.toggle(
+          'active',
+          isSummary
+        );
+
+      if (isSummary) {
+        callApi('summary')
+          .then(function(data) {
+            updateSummary(
+              data.summary || {}
+            );
+          })
+          .catch(handleError);
+      }
     }
 
-    function switchTab(index) {
-      currentTabIndex = index;
-      const wrapper = document.getElementById("screensWrapper");
-      if (wrapper) {
-        wrapper.style.transform = `translateX(-${index * 50}%)`;
-      }
+    function callApi(action, params) {
+      params = params || {};
 
-      for (let i = 0; i < 2; i++) {
-        const btn = document.getElementById(`tabBtn${i}`);
-        if (btn) {
-          if (i === index) {
-            btn.className = "tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-sky-400 font-bold transition scale-105";
-          } else {
-            btn.className = "tab-btn flex flex-col items-center justify-center py-1 rounded-xl text-slate-500 hover:text-slate-300 transition";
+      return new Promise(
+        function(resolve, reject) {
+          const callbackName =
+            'jsonpCallback_' +
+            Date.now() +
+            '_' +
+            Math.floor(
+              Math.random() * 100000
+            );
+
+          let finished = false;
+
+          const script =
+            document.createElement('script');
+
+          const timeoutId =
+            setTimeout(
+              function() {
+                finish(
+                  new Error(
+                    'Loading timed out.'
+                  )
+                );
+              },
+              15000
+            );
+
+          function cleanup() {
+            clearTimeout(timeoutId);
+            delete window[callbackName];
+
+            if (script.parentNode) {
+              script.parentNode
+                .removeChild(script);
+            }
           }
-        }
-      }
-    }
 
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const wrapper = document.getElementById("screensWrapper");
+          function finish(error, data) {
+            if (finished) {
+              return;
+            }
 
-    wrapper.addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
+            finished = true;
+            cleanup();
 
-    wrapper.addEventListener('touchend', e => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
-      const diffX = touchStartX - touchEndX;
-      if (Math.abs(diffX) > 60) {
-        if (diffX > 0 && currentTabIndex < 1) {
-          switchTab(1);
-        } else if (diffX < 0 && currentTabIndex > 0) {
-          switchTab(0);
-        }
-      }
-    }
-
-    function initCategory() {
-      const savedCat = localStorage.getItem("household_kakeibo_category") !== null 
-        ? localStorage.getItem("household_kakeibo_category") 
-        : "";
-      const selectElem = document.getElementById("inputCategory");
-      if (selectElem) {
-        selectElem.value = savedCat;
-        selectElem.addEventListener("change", (e) => {
-          localStorage.setItem("household_kakeibo_category", e.target.value);
-        });
-      }
-    }
-
-    function setItem(item) {
-      const inputItem = document.getElementById("inputItem");
-      if (inputItem) inputItem.value = item;
-
-      document.querySelectorAll(".item-chip").forEach(chip => {
-        if (chip.textContent.includes(item)) {
-          chip.className = "item-chip py-2 px-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500/20 text-sky-300";
-        } else {
-          chip.className = "item-chip py-2 px-1 text-xs font-bold rounded-lg border border-slate-700 bg-slate-800 text-slate-300";
-        }
-      });
-    }
-
-    async function fetchSummary() {
-      const refreshBtn = document.getElementById("btnRefresh");
-      const errorBanner = document.getElementById("errorBanner");
-      if (refreshBtn) refreshBtn.classList.add("opacity-50", "pointer-events-none");
-
-      try {
-        const res = await fetch(GAS_URL);
-        const json = await res.json();
-        if (json.status === "success" && json.data) {
-          if (errorBanner) errorBanner.classList.add("hidden");
-          updateUI(json.data);
-        } else {
-          throw new Error(json.message || "データ形式が無効です");
-        }
-      } catch (err) {
-        console.error("取得失敗:", err);
-        if (errorBanner) {
-          errorBanner.classList.remove("hidden");
-          setText("errorMessageText", err.message || "通信エラーが発生しました");
-        }
-      } finally {
-        if (refreshBtn) refreshBtn.classList.remove("opacity-50", "pointer-events-none");
-      }
-    }
-
-    function updateProgressBar(barId, percent) {
-      const barElem = document.getElementById(barId);
-      if (!barElem) return;
-      barElem.style.width = `${Math.min(100, Math.max(0, percent))}%`;
-      if (percent >= 100) {
-        barElem.className = "h-full bg-rose-500 rounded-full transition-all duration-500";
-      } else if (percent >= 80) {
-        barElem.className = "h-full bg-amber-400 rounded-full transition-all duration-500";
-      } else {
-        barElem.className = "h-full bg-sky-500 rounded-full transition-all duration-500";
-      }
-    }
-
-    function updateUI(data) {
-      try {
-        setText("labelMonth", data.sheetName || "今月");
-        
-        // 口座・資産・カード・立替
-        if (data.accounts) {
-          setText("valCommonAccount", `¥${Number(data.accounts.common || 0).toLocaleString()}`);
-          setText("valSbiAccount", `¥${Number(data.accounts.sbi || 0).toLocaleString()}`);
-          setText("valAssetAccount", `¥${Number(data.accounts.asset || 0).toLocaleString()}`);
-          setText("valNextCard", data.accounts.nextCard || "¥0");
-          setText("valOguraTatekae", `¥${Number(data.accounts.ogura || 0).toLocaleString()}`);
-          setText("valMonmaTatekae", `¥${Number(data.accounts.monma || 0).toLocaleString()}`);
-        }
-
-        // 食材費
-        if (data.food) {
-          const foodRem = data.food.remaining || 0;
-          const foodRemElem = document.getElementById("valFoodRemaining");
-          if (foodRemElem) {
-            foodRemElem.textContent = `¥${foodRem.toLocaleString()}`;
-            foodRemElem.className = foodRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-sky-400 ml-1";
+            if (error) {
+              reject(error);
+            } else {
+              resolve(data);
+            }
           }
-          setText("valFoodSpent", `¥${Number(data.food.spent || 0).toLocaleString()}`);
-          setText("valFoodBudget", `¥${Number(data.food.budget || 0).toLocaleString()}`);
-          setText("valFoodPercent", `${data.food.percent || 0}%`);
-          updateProgressBar("foodBar", data.food.percent || 0);
-        }
 
-        // 日用品
-        if (data.dailyGoods) {
-          const dailyRem = data.dailyGoods.remaining || 0;
-          const dailyRemElem = document.getElementById("valDailyRemaining");
-          if (dailyRemElem) {
-            dailyRemElem.textContent = `¥${dailyRem.toLocaleString()}`;
-            dailyRemElem.className = dailyRem < 0 ? "text-lg font-extrabold text-rose-500 ml-1" : "text-lg font-extrabold text-emerald-400 ml-1";
-          }
-          setText("valDailySpent", `¥${Number(data.dailyGoods.spent || 0).toLocaleString()}`);
-          setText("valDailyBudget", `¥${Number(data.dailyGoods.budget || 0).toLocaleString()}`);
-          setText("valDailyPercent", `${data.dailyGoods.percent || 0}%`);
-          updateProgressBar("dailyBar", data.dailyGoods.percent || 0);
-        }
+          window[callbackName] =
+            function(data) {
+              if (
+                !data ||
+                data.success === false
+              ) {
+                finish(
+                  new Error(
+                    data && data.message
+                      ? data.message
+                      : 'API error.'
+                  )
+                );
 
-        // 変動費全体
-        if (data.total) {
-          setText("valTotalRemaining", `¥${Number(data.total.remaining || 0).toLocaleString()}`);
-          setText("valDailyAllowance", `約 ¥${Number(data.total.dailyAllowance || 0).toLocaleString()} /日`);
-          setText("valRemainingDays", `(残${data.total.remainingDays || 0}日)`);
-        }
+                return;
+              }
 
-        // 履歴一覧
-        const logList = document.getElementById("logList");
-        if (logList) {
-          if (!data.recentLogs || data.recentLogs.length === 0) {
-            logList.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs w-full">まだ入力はありません</div>';
-          } else {
-            logList.innerHTML = data.recentLogs.map(log => `
-              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-800 hover:border-slate-700 transition">
-                <div class="flex items-center gap-2.5">
-                  <span class="text-[11px] text-slate-500 font-mono">${log.date}</span>
-                  <div>
-                    <div class="font-bold text-slate-200 text-xs">
-                      ${log.item || '未分類'}
-                      ${log.category ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-normal ml-1">${log.category}</span>` : ''}
-                    </div>
-                    ${log.memo ? `<div class="text-[11px] text-slate-400 mt-0.5">${log.memo}</div>` : ''}
-                  </div>
-                </div>
-                <div class="font-extrabold text-sm text-slate-100">¥${Number(log.amount || 0).toLocaleString()}</div>
-              </div>
-            `).join("");
-          }
+              finish(null, data);
+            };
+
+          const query = [
+            'action=' +
+              encodeURIComponent(action),
+            'callback=' +
+              encodeURIComponent(
+                callbackName
+              )
+          ];
+
+          Object.keys(params)
+            .forEach(function(key) {
+              query.push(
+                encodeURIComponent(key) +
+                '=' +
+                encodeURIComponent(
+                  params[key]
+                )
+              );
+            });
+
+          script.src =
+            API_URL +
+            '?' +
+            query.join('&');
+
+          script.onerror =
+            function() {
+              finish(
+                new Error(
+                  'Could not connect to the API.'
+                )
+              );
+            };
+
+          document.body
+            .appendChild(script);
         }
-      } catch (e) {
-        console.error("updateUIエラー:", e);
-      }
+      );
     }
 
-    function showToast() {
-      const toast = document.getElementById("toast");
-      if (!toast) return;
-      toast.classList.remove("opacity-0", "-translate-y-2", "pointer-events-none");
-      toast.classList.add("opacity-100", "translate-y-0");
-      setTimeout(() => {
-        toast.classList.remove("opacity-100", "translate-y-0");
-        toast.classList.add("opacity-0", "-translate-y-2", "pointer-events-none");
-      }, 2500);
+    function handleInitialData(data) {
+      todayTextEl.textContent =
+        data.todayText || '';
+
+      sheetNameEl.textContent =
+        data.sheetName || '';
+
+      renderTabs(
+        categoryTabsEl,
+        data.categories || [],
+        'category'
+      );
+
+      renderTabs(
+        itemTabsEl,
+        data.items || [],
+        'item'
+      );
+
+      updateSummary(
+        data.summary || {}
+      );
+
+      loadingEl.style.display =
+        'none';
+
+      formEl.style.display =
+        'block';
+
+      hideStatus();
     }
 
-    async function submitExpense(e) {
-      e.preventDefault();
-      const amountInput = document.getElementById("inputAmount");
-      const memoInput = document.getElementById("inputMemo");
-      const categorySelect = document.getElementById("inputCategory");
-      const itemInput = document.getElementById("inputItem");
-      const amount = Number(amountInput ? amountInput.value : 0);
+    function renderTabs(
+      container,
+      options,
+      type
+    ) {
+      container.innerHTML = '';
 
-      if (!amount || amount <= 0) {
-        alert("金額を入力してください");
+      if (!options.length) {
+        const empty =
+          document.createElement('div');
+
+        empty.className =
+          'empty-options';
+
+        empty.textContent =
+          type === 'category'
+            ? 'C21の入力規則に選択肢がありません。'
+            : 'D21の入力規則に選択肢がありません。';
+
+        container.appendChild(empty);
         return;
       }
 
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
+      options.forEach(
+        function(value, index) {
+          const button =
+            document.createElement(
+              'button'
+            );
 
-      const payload = {
-        date: `${yyyy}/${mm}/${dd}`,
-        category: categorySelect ? categorySelect.value : "",
-        item: itemInput ? itemInput.value : "食材費",
-        amount: amount,
-        memo: memoInput ? memoInput.value.trim() : ""
-      };
+          button.type = 'button';
+          button.className =
+            'choice-button';
 
-      const submitBtn = document.getElementById("btnSubmit");
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "<span>送信中...</span>";
-      }
+          button.textContent = value;
+          button.dataset.value = value;
 
-      try {
-        const res = await fetch(GAS_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        if (json.status === "success") {
-          if (amountInput) amountInput.value = "";
-          if (memoInput) memoInput.value = "";
-          updateUI(json.data);
-          showToast();
-        } else {
-          alert("エラー: " + json.message);
+          if (index === 0) {
+            button.classList.add(
+              'active'
+            );
+
+            if (type === 'category') {
+              selectedCategory = value;
+            } else {
+              selectedItem = value;
+            }
+          }
+
+          button.addEventListener(
+            'click',
+            function() {
+              const buttons =
+                container.querySelectorAll(
+                  '.choice-button'
+                );
+
+              buttons.forEach(
+                function(target) {
+                  target.classList.remove(
+                    'active'
+                  );
+                }
+              );
+
+              button.classList.add(
+                'active'
+              );
+
+              if (type === 'category') {
+                selectedCategory = value;
+              } else {
+                selectedItem = value;
+              }
+
+              button.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+              });
+            }
+          );
+
+          container.appendChild(
+            button
+          );
         }
-      } catch (err) {
-        alert("送信エラー: " + err.toString());
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = "<span>スプシに保存</span>";
-        }
-      }
+      );
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      initCategory();
-      fetchSummary();
-      switchTab(0);
-    });
+    formEl.addEventListener(
+      'submit',
+      function(event) {
+        event.preventDefault();
+
+        if (!selectedCategory) {
+          showStatus(
+            'Please select a Category.',
+            'error'
+          );
+
+          return;
+        }
+
+        if (!selectedItem) {
+          showStatus(
+            'Please select an Item.',
+            'error'
+          );
+
+          return;
+        }
+
+        if (
+          !amountEl.value ||
+          Number(amountEl.value) <= 0
+        ) {
+          showStatus(
+            'Please enter an Amount.',
+            'error'
+          );
+
+          amountEl.focus();
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent =
+          'Saving...';
+
+        showStatus(
+          'Saving...',
+          'info'
+        );
+
+        callApi('add', {
+          category: selectedCategory,
+          item: selectedItem,
+          amount: amountEl.value,
+          memo: memoEl.value
+        })
+          .then(handleSaved)
+          .catch(handleError);
+      }
+    );
+
+    function handleSaved(result) {
+      showStatus(
+        'Saved.',
+        'success'
+      );
+
+      if (navigator.vibrate) {
+        navigator.vibrate(80);
+      }
+
+      const saved =
+        result.saved || {};
+
+      lastEl.className =
+        'last show';
+
+      lastEl.textContent =
+        'Last saved: ' +
+        (result.sheetName || '') +
+        ' / Row ' +
+        (result.row || '') +
+        ' — ' +
+        (saved.date || '') +
+        ' ' +
+        (
+          saved.category ||
+          'Card Payment'
+        ) +
+        ' ' +
+        (saved.item || '') +
+        ' ¥' +
+        Number(
+          saved.amount || 0
+        ).toLocaleString() +
+        (
+          saved.memo
+            ? ' ' + saved.memo
+            : ''
+        );
+
+      updateSummary(
+        result.summary || {}
+      );
+
+      amountEl.value = '';
+      memoEl.value = '';
+
+      submitButton.disabled = false;
+      submitButton.textContent =
+        'Save';
+
+      amountEl.focus();
+    }
+
+    function updateSummary(summary) {
+      getElement(
+        'socialBudget'
+      ).textContent =
+        formatYen(
+          summary.socialBudget
+        );
+
+      getElement(
+        'socialRemaining'
+      ).textContent =
+        formatYen(
+          summary.socialRemaining
+        );
+
+      setBalance(
+        getElement('socialBalance'),
+        summary.socialBalance
+      );
+
+      getElement(
+        'foodBudget'
+      ).textContent =
+        formatYen(
+          summary.foodBudget
+        );
+
+      getElement(
+        'foodRemaining'
+      ).textContent =
+        formatYen(
+          summary.foodRemaining
+        );
+
+      setBalance(
+        getElement('foodBalance'),
+        summary.foodBalance
+      );
+
+      getElement(
+        'cardPayment'
+      ).textContent =
+        formatYen(
+          summary.cardPayment
+        );
+    }
+
+    function setBalance(
+      element,
+      value
+    ) {
+      const number =
+        Number(value || 0);
+
+      element.textContent =
+        (
+          number < 0
+            ? '-'
+            : ''
+        ) +
+        formatYen(
+          Math.abs(number)
+        );
+
+      element.classList.toggle(
+        'minus',
+        number < 0
+      );
+
+      element.classList.toggle(
+        'plus',
+        number >= 0
+      );
+    }
+
+    function formatYen(value) {
+      return (
+        '¥' +
+        Number(
+          value || 0
+        ).toLocaleString()
+      );
+    }
+
+    function showStatus(
+      message,
+      type
+    ) {
+      statusEl.textContent =
+        message;
+
+      statusEl.className =
+        'status show ' + type;
+    }
+
+    function hideStatus() {
+      statusEl.textContent = '';
+      statusEl.className =
+        'status';
+    }
+
+    function handleError(error) {
+      loadingEl.style.display =
+        'none';
+
+      showStatus(
+        error.message ||
+          String(error),
+        'error'
+      );
+
+      submitButton.disabled = false;
+      submitButton.textContent =
+        'Save';
+    }
   </script>
 </body>
 </html>
