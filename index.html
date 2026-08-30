@@ -1,1437 +1,1520 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,viewport-fit=cover"
->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
-<title>Money Log House</title>
+  <title>Money Log House</title>
 
-<style>
-:root {
-  --bg: #f5f7f8;
-  --card: #ffffff;
-  --text: #1f2933;
-  --sub: #6b7280;
-  --border: #d9dee3;
-  --green: #16a34a;
-  --red: #d93025;
-  --blue: #1a73e8;
-}
+  <style>
+    :root {
+      --bg: #f5f7f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --sub: #6b7280;
+      --border: #d9dee3;
+      --green: #16a34a;
+      --red: #d93025;
+      --blue: #1a73e8;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  padding: 16px 16px 96px;
-  background: var(--bg);
-  color: var(--text);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-}
+    body {
+      margin: 0;
+      padding: 16px 16px 96px;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
 
-.app {
-  max-width: 480px;
-  margin: auto;
-}
+    button,
+    input,
+    textarea {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.header {
-  margin-bottom: 16px;
-}
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+    }
 
-h1 {
-  margin: 0 0 8px;
-  font-size: 30px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-}
+    .header {
+      margin-bottom: 16px;
+    }
 
-.meta {
-  color: var(--sub);
-  font-size: 14px;
-  line-height: 1.7;
-}
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
 
-.card {
-  margin-bottom: 14px;
-  padding: 18px;
-  background: var(--card);
-  border: 1px solid #e6e5e3;
-  border-radius: 16px;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.05),
-    0 4px 12px rgba(0,0,0,.04);
-}
+    .meta {
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.7;
+    }
 
-.screen {
-  display: none;
-}
+    .card {
+      margin-bottom: 14px;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid #e6e5e3;
+      border-radius: 16px;
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.05),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+    }
 
-.screen.active {
-  display: block;
-}
+    .screen {
+      display: none;
+    }
 
-.title {
-  margin: 0 0 14px;
-  font-size: 20px;
-}
+    .screen.active {
+      display: block;
+    }
 
-.status {
-  display: none;
-  margin-bottom: 14px;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-}
+    .title {
+      margin: 0 0 14px;
+      font-size: 20px;
+      font-weight: 800;
+    }
 
-.status.show {
-  display: block;
-}
+    .status {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-.status.info {
-  color: var(--blue);
-  background: #e5f2fc;
-}
+    .status.show {
+      display: block;
+    }
 
-.status.success {
-  color: #267a4c;
-  background: #e8f1ec;
-}
+    .status.info {
+      color: var(--blue);
+      background: #e5f2fc;
+    }
 
-.status.error {
-  color: var(--red);
-  background: #fce9e7;
-}
+    .status.success {
+      color: #267a4c;
+      background: #e8f1ec;
+    }
 
-.loading {
-  padding: 24px;
-  color: var(--sub);
-  text-align: center;
-}
+    .status.error {
+      color: var(--red);
+      background: #fce9e7;
+    }
 
-.label {
-  display: block;
-  margin: 16px 0 8px;
-  font-size: 14px;
-  font-weight: 800;
-}
+    .loading {
+      padding: 24px;
+      color: var(--sub);
+      text-align: center;
+    }
 
-.dropdown {
-  position: relative;
-}
+    .label {
+      display: block;
+      margin: 16px 0 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
 
-.dropdown-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 50px;
-  padding: 0 14px;
-  color: var(--text);
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 700;
-  text-align: left;
-}
+    .dropdown {
+      position: relative;
+    }
 
-.dropdown-toggle.open {
-  border-color: var(--green);
-  box-shadow:
-    0 0 0 3px
-    rgba(22,163,74,.13);
-}
+    .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 50px;
+      padding: 0 14px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
 
-.arrow {
-  color: var(--sub);
-  font-size: 15px;
-}
+    .dropdown-toggle.open {
+      border-color: var(--green);
+      box-shadow:
+        0 0 0 3px rgba(22, 163, 74, 0.13);
+    }
 
-.dropdown-toggle.open .arrow {
-  transform: rotate(180deg);
-}
+    .arrow {
+      color: var(--sub);
+      font-size: 15px;
+      transition: transform 0.15s;
+    }
 
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  left: 0;
-  z-index: 30;
-  max-height: 260px;
-  overflow-y: auto;
-  padding: 8px;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow:
-    0 14px 32px
-    rgba(0,0,0,.16);
-  -webkit-overflow-scrolling: touch;
-}
+    .dropdown-toggle.open .arrow {
+      transform: rotate(180deg);
+    }
 
-.dropdown-menu.open {
-  display: block;
-}
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      left: 0;
+      z-index: 30;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 8px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.16);
+      -webkit-overflow-scrolling: touch;
+    }
 
-.option {
-  display: block;
-  width: 100%;
-  min-height: 46px;
-  padding: 11px 12px;
-  color: var(--text);
-  background: #ffffff;
-  border: 0;
-  border-radius: 10px;
-  font-size: 16px;
-  text-align: left;
-}
+    .dropdown-menu.open {
+      display: block;
+    }
 
-.option + .option {
-  margin-top: 2px;
-}
+    .option {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      padding: 11px 12px;
+      color: var(--text);
+      background: #ffffff;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
 
-.option.selected {
-  color: #166534;
-  background: #dcfce7;
-  font-weight: 800;
-}
+    .option + .option {
+      margin-top: 2px;
+    }
 
-input,
-textarea {
-  width: 100%;
-  padding: 14px 12px;
-  color: var(--text);
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  font-size: 17px;
-  outline: none;
-}
+    .option:hover,
+    .option:focus-visible {
+      background: #f0fdf4;
+      outline: none;
+    }
 
-input:focus,
-textarea:focus {
-  border-color: var(--green);
-  box-shadow:
-    0 0 0 3px
-    rgba(22,163,74,.13);
-}
+    .option.selected {
+      color: #166534;
+      background: #dcfce7;
+      font-weight: 800;
+    }
 
-textarea {
-  min-height: 84px;
-  resize: vertical;
-}
+    .empty-options {
+      padding: 12px;
+      color: var(--sub);
+      font-size: 14px;
+    }
 
-.amount {
-  position: relative;
-}
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px 12px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 17px;
+      outline: none;
+    }
 
-.yen {
-  position: absolute;
-  top: 50%;
-  left: 14px;
-  color: var(--sub);
-  transform: translateY(-50%);
-}
+    input:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow:
+        0 0 0 3px rgba(22, 163, 74, 0.13);
+    }
 
-#amount {
-  padding-left: 36px;
-  font-weight: 800;
-}
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
 
-.save {
-  width: 100%;
-  min-height: 56px;
-  margin-top: 20px;
-  color: #ffffff;
-  background:
-    linear-gradient(
-      135deg,
-      #16a34a,
-      #22c55e 45%,
-      #14b8a6
-    );
-  border: 0;
-  border-radius: 16px;
-  font-size: 20px;
-  font-weight: 900;
-  box-shadow:
-    0 14px 28px
-    rgba(34,197,94,.22);
-}
+    .amount {
+      position: relative;
+    }
 
-.save:disabled {
-  opacity: 0.6;
-}
+    .yen {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      color: var(--sub);
+      transform: translateY(-50%);
+    }
 
-.totals {
-  display: grid;
-  grid-template-columns:
-    repeat(2,1fr);
-  gap: 8px;
-}
+    #amount {
+      padding-left: 36px;
+      font-weight: 800;
+    }
 
-.total {
-  position: relative;
-  padding: 14px 10px;
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-}
+    .save {
+      width: 100%;
+      min-height: 56px;
+      margin-top: 20px;
+      color: #ffffff;
+      background:
+        linear-gradient(
+          135deg,
+          #16a34a,
+          #22c55e 45%,
+          #14b8a6
+        );
+      border: 0;
+      border-radius: 16px;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow:
+        0 14px 28px rgba(34, 197, 94, 0.22);
+      cursor: pointer;
+    }
 
-.total-budget {
-  position: absolute;
-  top: 14px;
-  right: 12px;
-  margin: 0;
-  color: var(--sub);
-  font-size: 12px;
-  font-weight: 800;
-}
+    .save:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-.total-name {
-  color: var(--sub);
-  font-size: 12px;
-  font-weight: 800;
-}
+    .last {
+      display: none;
+      margin-top: 12px;
+      color: var(--sub);
+      font-size: 13px;
+      line-height: 1.6;
+    }
 
-.total-value {
-  margin-top: 7px;
-  font-size: 21px;
-  font-weight: 850;
-  letter-spacing: -0.03em;
-}
+    .last.show {
+      display: block;
+    }
 
-.history-list {
-  display: grid;
-  gap: 10px;
-  max-height: 65vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
 
-.history-item {
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-}
+    .total {
+      position: relative;
+      min-height: 112px;
+      padding: 14px 10px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
 
-.history-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
+    .total-name {
+      padding-right: 70px;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 800;
+    }
 
-.history-date {
-  color: var(--sub);
-  font-size: 12px;
-}
+    .total-budget {
+      position: absolute;
+      top: 14px;
+      right: 12px;
+      margin: 0;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: right;
+    }
 
-.history-amount {
-  font-size: 18px;
-  font-weight: 850;
-}
+    .total-value {
+      margin-top: 24px;
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
 
-.history-main {
-  margin-top: 7px;
-  font-size: 15px;
-  font-weight: 750;
-}
+    .history-list {
+      display: grid;
+      gap: 10px;
+      max-height: 65vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-.history-memo {
-  margin-top: 5px;
-  color: var(--sub);
-  font-size: 13px;
-}
+    .history-item {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
 
-.empty {
-  padding: 30px;
-  color: var(--sub);
-  text-align: center;
-}
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-.last {
-  display: none;
-  margin-top: 12px;
-  color: var(--sub);
-  font-size: 13px;
-}
+    .history-date {
+      color: var(--sub);
+      font-size: 12px;
+    }
 
-.last.show {
-  display: block;
-}
+    .history-amount {
+      font-size: 18px;
+      font-weight: 850;
+      text-align: right;
+    }
 
-.tabs {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 20;
-  padding:
-    10px
-    16px
-    calc(
-      10px +
-      env(safe-area-inset-bottom)
-    );
-  background:
-    rgba(245,247,248,.94);
-  border-top:
-    1px solid var(--border);
-  backdrop-filter:
-    blur(12px);
-}
+    .history-main {
+      margin-top: 7px;
+      font-size: 15px;
+      font-weight: 750;
+    }
 
-.tab-inner {
-  display: grid;
-  grid-template-columns:
-    1fr 1fr;
-  gap: 8px;
-  max-width: 480px;
-  margin: auto;
-  padding: 5px;
-  background: #e9edf2;
-  border-radius: 16px;
-}
+    .history-memo {
+      margin-top: 5px;
+      color: var(--sub);
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-.tab {
-  min-height: 44px;
-  color: var(--sub);
-  background: transparent;
-  border: 0;
-  border-radius: 12px;
-  font-weight: 800;
-}
+    .empty {
+      padding: 30px;
+      color: var(--sub);
+      text-align: center;
+    }
 
-.tab.active {
-  color: var(--text);
-  background: #ffffff;
-  box-shadow:
-    0 3px 10px
-    rgba(0,0,0,.08);
-}
+    .tabs {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 20;
+      padding:
+        10px
+        16px
+        calc(10px + env(safe-area-inset-bottom));
+      background: rgba(245, 247, 248, 0.94);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
 
-@media (max-width:520px) {
-  body {
-    padding:
-      12px
-      12px
-      92px;
-  }
+    .tab-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 5px;
+      background: #e9edf2;
+      border-radius: 16px;
+    }
 
-  h1 {
-    font-size: 28px;
-  }
+    .tab {
+      min-height: 44px;
+      color: var(--sub);
+      background: transparent;
+      border: 0;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
-  .card {
-    padding: 16px;
-  }
+    .tab.active {
+      color: var(--text);
+      background: #ffffff;
+      box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.08);
+    }
 
-  .total-value {
-    font-size: 18px;
-  }
-}
-</style>
+    @media (max-width: 520px) {
+      body {
+        padding:
+          12px
+          12px
+          calc(92px + env(safe-area-inset-bottom));
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      input,
+      textarea {
+        font-size: 16px;
+      }
+
+      .total-value {
+        font-size: 18px;
+      }
+
+      .total-budget {
+        font-size: 11px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div class="app">
-  <header class="header">
-    <h1>Money Log House</h1>
+  <div class="app">
+    <header class="header">
+      <h1>Money Log House</h1>
 
-    <div class="meta">
-      <div>
-        Date:
-        <span id="todayText">
-          Loading...
-        </span>
-      </div>
-
-      <div>
-        Sheet:
-        <span id="sheetName">
-          Loading...
-        </span>
-      </div>
-    </div>
-  </header>
-
-  <section
-    id="logScreen"
-    class="screen active"
-  >
-    <div class="card">
-      <h2 class="title">
-        Log Entry
-      </h2>
-
-      <div
-        id="status"
-        class="status"
-      ></div>
-
-      <div
-        id="loading"
-        class="loading"
-      >
-        Loading...
-      </div>
-
-      <form
-        id="form"
-        style="display:none"
-      >
-        <label class="label">
-          Category
-        </label>
-
-        <div class="dropdown">
-          <button
-            id="categoryToggle"
-            class="dropdown-toggle"
-            type="button"
-          >
-            <span id="categoryLabel">
-              Select Category
-            </span>
-
-            <span class="arrow">
-              ▼
-            </span>
-          </button>
-
-          <div
-            id="categoryMenu"
-            class="dropdown-menu"
-          ></div>
+      <div class="meta">
+        <div>
+          Date:
+          <span id="todayText">
+            Loading...
+          </span>
         </div>
 
-        <label class="label">
-          Item
-        </label>
-
-        <div class="dropdown">
-          <button
-            id="itemToggle"
-            class="dropdown-toggle"
-            type="button"
-          >
-            <span id="itemLabel">
-              Select Item
-            </span>
-
-            <span class="arrow">
-              ▼
-            </span>
-          </button>
-
-          <div
-            id="itemMenu"
-            class="dropdown-menu"
-          ></div>
-        </div>
-
-        <label
-          class="label"
-          for="amount"
-        >
-          Amount
-        </label>
-
-        <div class="amount">
-          <span class="yen">¥</span>
-
-          <input
-            id="amount"
-            type="number"
-            inputmode="numeric"
-            min="1"
-            placeholder="Amount"
-            required
-          >
-        </div>
-
-        <label
-          class="label"
-          for="memo"
-        >
-          Memo
-        </label>
-
-        <textarea
-          id="memo"
-          placeholder="Optional note"
-        ></textarea>
-
-        <button
-          id="save"
-          class="save"
-          type="submit"
-        >
-          Save
-        </button>
-      </form>
-
-      <div
-        id="last"
-        class="last"
-      ></div>
-    </div>
-
-    <div class="card">
-      <h2 class="title">
-        This Month
-      </h2>
-
-      <div class="totals">
-        <div class="total">
-          <div class="total-name">
-            Food
-          </div>
-
-          <div
-            id="foodBudget"
-            class="total-budget"
-          >
-             ¥0
-          </div>
-
-          <div
-            id="foodTotal"
-            class="total-value"
-          >
-            ¥0
-          </div>
-        </div>
-
-        <div class="total">
-          <div class="total-name">
-            Daily Goods
-          </div>
-
-          <div
-            id="dailyBudget"
-            class="total-budget"
-          >
-             ¥0
-          </div>
-
-          <div
-            id="dailyTotal"
-            class="total-value"
-          >
-            ¥0
-          </div>
-        </div>
-
-        <div class="total">
-          <div class="total-name">
-            Utilities
-          </div>
-
-          <div
-            id="utilitiesBudget"
-            class="total-budget"
-          >
-             ¥0
-          </div>
-
-          <div
-            id="utilitiesTotal"
-            class="total-value"
-          >
-            ¥0
-          </div>
-        </div>
-
-        <div class="total">
-          <div class="total-name">
-            Card
-          </div>
-
-          <div class="total-budget">
-            Total
-          </div>
-
-          <div
-            id="cardTotal"
-            class="total-value"
-          >
-            ¥0
-          </div>
+        <div>
+          Sheet:
+          <span id="sheetName">
+            Loading...
+          </span>
         </div>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <section
-    id="historyScreen"
-    class="screen"
-  >
-    <div class="card">
-      <h2 class="title">
-        History
-      </h2>
-
-      <div
-        id="historyList"
-        class="history-list"
-      >
-        <div class="empty">
-          Loading...
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-
-<nav class="tabs">
-  <div class="tab-inner">
-    <button
-      id="logTab"
-      class="tab active"
-      type="button"
+    <section
+      id="logScreen"
+      class="screen active"
     >
-      Log
-    </button>
+      <div class="card">
+        <h2 class="title">
+          Log Entry
+        </h2>
 
-    <button
-      id="historyTab"
-      class="tab"
-      type="button"
+        <div
+          id="status"
+          class="status"
+        ></div>
+
+        <div
+          id="loading"
+          class="loading"
+        >
+          Loading...
+        </div>
+
+        <form
+          id="form"
+          style="display:none"
+        >
+          <label class="label">
+            Category
+          </label>
+
+          <div class="dropdown">
+            <button
+              id="categoryToggle"
+              class="dropdown-toggle"
+              type="button"
+              aria-expanded="false"
+            >
+              <span id="categoryLabel">
+                Select Category
+              </span>
+
+              <span class="arrow">
+                ▼
+              </span>
+            </button>
+
+            <div
+              id="categoryMenu"
+              class="dropdown-menu"
+            ></div>
+          </div>
+
+          <label class="label">
+            Item
+          </label>
+
+          <div class="dropdown">
+            <button
+              id="itemToggle"
+              class="dropdown-toggle"
+              type="button"
+              aria-expanded="false"
+            >
+              <span id="itemLabel">
+                Select Item
+              </span>
+
+              <span class="arrow">
+                ▼
+              </span>
+            </button>
+
+            <div
+              id="itemMenu"
+              class="dropdown-menu"
+            ></div>
+          </div>
+
+          <label
+            class="label"
+            for="amount"
+          >
+            Amount
+          </label>
+
+          <div class="amount">
+            <span class="yen">¥</span>
+
+            <input
+              id="amount"
+              type="number"
+              inputmode="numeric"
+              min="1"
+              placeholder="Amount"
+              required
+            >
+          </div>
+
+          <label
+            class="label"
+            for="memo"
+          >
+            Memo
+          </label>
+
+          <textarea
+            id="memo"
+            placeholder="Optional note"
+          ></textarea>
+
+          <button
+            id="save"
+            class="save"
+            type="submit"
+          >
+            Save
+          </button>
+        </form>
+
+        <div
+          id="last"
+          class="last"
+        ></div>
+      </div>
+
+      <div class="card">
+        <h2 class="title">
+          This Month
+        </h2>
+
+        <div class="totals">
+          <div class="total">
+            <div class="total-name">
+              Food
+            </div>
+
+            <div
+              id="foodBudget"
+              class="total-budget"
+            >
+              ¥0
+            </div>
+
+            <div
+              id="foodTotal"
+              class="total-value"
+            >
+              ¥0
+            </div>
+          </div>
+
+          <div class="total">
+            <div class="total-name">
+              Daily Goods
+            </div>
+
+            <div
+              id="dailyBudget"
+              class="total-budget"
+            >
+              ¥0
+            </div>
+
+            <div
+              id="dailyTotal"
+              class="total-value"
+            >
+              ¥0
+            </div>
+          </div>
+
+          <div class="total">
+            <div class="total-name">
+              Utilities
+            </div>
+
+            <div
+              id="utilitiesBudget"
+              class="total-budget"
+            >
+              ¥0
+            </div>
+
+            <div
+              id="utilitiesTotal"
+              class="total-value"
+            >
+              ¥0
+            </div>
+          </div>
+
+          <div class="total">
+            <div class="total-name">
+              Card
+            </div>
+
+            <div
+              id="cardTotal"
+              class="total-value"
+            >
+              ¥0
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="historyScreen"
+      class="screen"
     >
-      History
-    </button>
+      <div class="card">
+        <h2 class="title">
+          History
+        </h2>
+
+        <div
+          id="historyList"
+          class="history-list"
+        >
+          <div class="empty">
+            Loading...
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-</nav>
 
-<script>
-const API_URL =
-  'https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec';
+  <nav class="tabs">
+    <div class="tab-inner">
+      <button
+        id="logTab"
+        class="tab active"
+        type="button"
+      >
+        Log
+      </button>
 
-const getElement = function(id) {
-  return document.getElementById(id);
-};
+      <button
+        id="historyTab"
+        class="tab"
+        type="button"
+      >
+        History
+      </button>
+    </div>
+  </nav>
 
-let selectedCategory = '';
-let selectedItem = '';
+  <script>
+    const API_URL =
+      'https://script.google.com/macros/s/AKfycbyQ9SVkfL0PbrMw4wnLtza8GUhWF7nLSUK9ma748BqU6Ul-LrtZTc-p84UPUwcTRtd7/exec';
 
-window.addEventListener(
-  'load',
-  function() {
-    showStatus(
-      'Loading data...',
-      'info'
-    );
+    const getElement = function(id) {
+      return document.getElementById(id);
+    };
 
-    callApi('init')
-      .then(initializeApp)
-      .catch(handleError);
-  }
-);
+    let selectedCategory = '';
+    let selectedItem = '';
 
-getElement('logTab').onclick =
-  function() {
-    switchScreen(false);
-  };
-
-getElement('historyTab').onclick =
-  function() {
-    switchScreen(true);
-  };
-
-getElement('categoryToggle').onclick =
-  function(event) {
-    event.stopPropagation();
-    toggleMenu('category');
-  };
-
-getElement('itemToggle').onclick =
-  function(event) {
-    event.stopPropagation();
-    toggleMenu('item');
-  };
-
-document.addEventListener(
-  'click',
-  closeMenus
-);
-
-function toggleMenu(type) {
-  const menu =
-    getElement(type + 'Menu');
-
-  const button =
-    getElement(type + 'Toggle');
-
-  const willOpen =
-    !menu.classList.contains(
-      'open'
-    );
-
-  closeMenus();
-
-  if (willOpen) {
-    menu.classList.add('open');
-    button.classList.add('open');
-  }
-}
-
-function closeMenus() {
-  ['category', 'item']
-    .forEach(function(type) {
-      getElement(type + 'Menu')
-        .classList.remove('open');
-
-      getElement(type + 'Toggle')
-        .classList.remove('open');
-    });
-}
-
-function switchScreen(
-  showHistory
-) {
-  closeMenus();
-
-  getElement('logScreen')
-    .classList.toggle(
-      'active',
-      !showHistory
-    );
-
-  getElement('historyScreen')
-    .classList.toggle(
-      'active',
-      showHistory
-    );
-
-  getElement('logTab')
-    .classList.toggle(
-      'active',
-      !showHistory
-    );
-
-  getElement('historyTab')
-    .classList.toggle(
-      'active',
-      showHistory
-    );
-
-  if (showHistory) {
-    callApi('history')
-      .then(function(data) {
-        updateTotals(
-          data.totals
+    window.addEventListener(
+      'load',
+      function() {
+        showStatus(
+          'Loading data...',
+          'info'
         );
 
-        renderHistory(
-          data.history
-        );
-      })
-      .catch(handleError);
-  }
-}
-
-function callApi(
-  action,
-  params
-) {
-  params = params || {};
-
-  return new Promise(
-    function(resolve, reject) {
-      const callbackName =
-        'callback_' +
-        Date.now() +
-        '_' +
-        Math.floor(
-          Math.random() * 100000
-        );
-
-      const script =
-        document.createElement(
-          'script'
-        );
-
-      let finished = false;
-
-      const timeoutId =
-        setTimeout(
-          function() {
-            finish(
-              new Error(
-                'Loading timed out.'
-              )
-            );
-          },
-          15000
-        );
-
-      function finish(
-        error,
-        data
-      ) {
-        if (finished) {
-          return;
-        }
-
-        finished = true;
-
-        clearTimeout(timeoutId);
-
-        delete window[
-          callbackName
-        ];
-
-        if (script.parentNode) {
-          script.parentNode
-            .removeChild(script);
-        }
-
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
+        callApi('init')
+          .then(initializeApp)
+          .catch(handleError);
       }
+    );
 
-      window[callbackName] =
-        function(data) {
-          if (
-            data &&
-            data.success !== false
-          ) {
-            finish(null, data);
-          } else {
-            finish(
-              new Error(
-                data &&
-                data.message
-                  ? data.message
-                  : 'API error.'
-              )
-            );
-          }
-        };
+    getElement('logTab')
+      .addEventListener(
+        'click',
+        function() {
+          switchScreen(false);
+        }
+      );
 
-      const query = [
-        'action=' +
-          encodeURIComponent(
-            action
-          ),
+    getElement('historyTab')
+      .addEventListener(
+        'click',
+        function() {
+          switchScreen(true);
+        }
+      );
 
-        'callback=' +
-          encodeURIComponent(
-            callbackName
-          )
-      ];
+    getElement('categoryToggle')
+      .addEventListener(
+        'click',
+        function(event) {
+          event.stopPropagation();
+          toggleMenu('category');
+        }
+      );
 
-      Object.keys(params)
-        .forEach(function(key) {
-          query.push(
-            encodeURIComponent(
-              key
-            ) +
-            '=' +
-            encodeURIComponent(
-              params[key]
-            )
+    getElement('itemToggle')
+      .addEventListener(
+        'click',
+        function(event) {
+          event.stopPropagation();
+          toggleMenu('item');
+        }
+      );
+
+    document.addEventListener(
+      'click',
+      closeMenus
+    );
+
+    function toggleMenu(type) {
+      const menu =
+        getElement(type + 'Menu');
+
+      const button =
+        getElement(type + 'Toggle');
+
+      const willOpen =
+        !menu.classList.contains(
+          'open'
+        );
+
+      closeMenus();
+
+      if (willOpen) {
+        menu.classList.add('open');
+        button.classList.add('open');
+
+        button.setAttribute(
+          'aria-expanded',
+          'true'
+        );
+      }
+    }
+
+    function closeMenus() {
+      ['category', 'item']
+        .forEach(function(type) {
+          const menu =
+            getElement(type + 'Menu');
+
+          const button =
+            getElement(type + 'Toggle');
+
+          menu.classList.remove(
+            'open'
+          );
+
+          button.classList.remove(
+            'open'
+          );
+
+          button.setAttribute(
+            'aria-expanded',
+            'false'
           );
         });
-
-      script.src =
-        API_URL +
-        '?' +
-        query.join('&');
-
-      script.onerror =
-        function() {
-          finish(
-            new Error(
-              'Could not connect to the API.'
-            )
-          );
-        };
-
-      document.body
-        .appendChild(script);
     }
-  );
-}
 
-function initializeApp(data) {
-  getElement('todayText')
-    .textContent =
-      data.todayText || '';
+    function switchScreen(
+      showHistory
+    ) {
+      closeMenus();
 
-  getElement('sheetName')
-    .textContent =
-      data.sheetName || '';
-
-  renderMenu(
-    'category',
-    data.categories || []
-  );
-
-  renderMenu(
-    'item',
-    data.items || []
-  );
-
-  updateTotals(
-    data.totals
-  );
-
-  renderHistory(
-    data.history
-  );
-
-  getElement('loading')
-    .style.display = 'none';
-
-  getElement('form')
-    .style.display = 'block';
-
-  hideStatus();
-}
-
-function renderMenu(
-  type,
-  options
-) {
-  const menu =
-    getElement(type + 'Menu');
-
-  const label =
-    getElement(type + 'Label');
-
-  menu.innerHTML = '';
-
-  options.forEach(
-    function(value, index) {
-      const button =
-        document.createElement(
-          'button'
+      getElement('logScreen')
+        .classList.toggle(
+          'active',
+          !showHistory
         );
 
-      button.type = 'button';
+      getElement('historyScreen')
+        .classList.toggle(
+          'active',
+          showHistory
+        );
 
-      button.className =
-        'option' +
+      getElement('logTab')
+        .classList.toggle(
+          'active',
+          !showHistory
+        );
+
+      getElement('historyTab')
+        .classList.toggle(
+          'active',
+          showHistory
+        );
+
+      if (showHistory) {
+        callApi('history')
+          .then(function(data) {
+            updateTotals(
+              data.totals
+            );
+
+            renderHistory(
+              data.history
+            );
+          })
+          .catch(handleError);
+      }
+    }
+
+    function callApi(
+      action,
+      params
+    ) {
+      params = params || {};
+
+      return new Promise(
+        function(resolve, reject) {
+          const callbackName =
+            'callback_' +
+            Date.now() +
+            '_' +
+            Math.floor(
+              Math.random() * 100000
+            );
+
+          const script =
+            document.createElement(
+              'script'
+            );
+
+          let finished = false;
+
+          const timeoutId =
+            setTimeout(
+              function() {
+                finish(
+                  new Error(
+                    'Loading timed out.'
+                  )
+                );
+              },
+              15000
+            );
+
+          function finish(
+            error,
+            data
+          ) {
+            if (finished) {
+              return;
+            }
+
+            finished = true;
+
+            clearTimeout(timeoutId);
+
+            delete window[
+              callbackName
+            ];
+
+            if (script.parentNode) {
+              script.parentNode
+                .removeChild(script);
+            }
+
+            if (error) {
+              reject(error);
+            } else {
+              resolve(data);
+            }
+          }
+
+          window[callbackName] =
+            function(data) {
+              if (
+                data &&
+                data.success !== false
+              ) {
+                finish(null, data);
+              } else {
+                finish(
+                  new Error(
+                    data &&
+                    data.message
+                      ? data.message
+                      : 'API error.'
+                  )
+                );
+              }
+            };
+
+          const query = [
+            'action=' +
+              encodeURIComponent(
+                action
+              ),
+
+            'callback=' +
+              encodeURIComponent(
+                callbackName
+              )
+          ];
+
+          Object.keys(params)
+            .forEach(function(key) {
+              query.push(
+                encodeURIComponent(
+                  key
+                ) +
+                '=' +
+                encodeURIComponent(
+                  params[key]
+                )
+              );
+            });
+
+          script.src =
+            API_URL +
+            '?' +
+            query.join('&');
+
+          script.onerror =
+            function() {
+              finish(
+                new Error(
+                  'Could not connect to the API.'
+                )
+              );
+            };
+
+          document.body
+            .appendChild(script);
+        }
+      );
+    }
+
+    function initializeApp(data) {
+      getElement('todayText')
+        .textContent =
+          data.todayText || '';
+
+      getElement('sheetName')
+        .textContent =
+          data.sheetName || '';
+
+      renderMenu(
+        'category',
+        data.categories || []
+      );
+
+      renderMenu(
+        'item',
+        data.items || []
+      );
+
+      updateTotals(
+        data.totals || {}
+      );
+
+      renderHistory(
+        data.history || []
+      );
+
+      getElement('loading')
+        .style.display = 'none';
+
+      getElement('form')
+        .style.display = 'block';
+
+      hideStatus();
+    }
+
+    function renderMenu(
+      type,
+      options
+    ) {
+      const menu =
+        getElement(type + 'Menu');
+
+      const label =
+        getElement(type + 'Label');
+
+      menu.innerHTML = '';
+
+      if (!options.length) {
+        const empty =
+          document.createElement(
+            'div'
+          );
+
+        empty.className =
+          'empty-options';
+
+        empty.textContent =
+          type === 'category'
+            ? 'C21の入力規則に選択肢がありません。'
+            : 'D21の入力規則に選択肢がありません。';
+
+        menu.appendChild(empty);
+        return;
+      }
+
+      options.forEach(
+        function(value, index) {
+          const button =
+            document.createElement(
+              'button'
+            );
+
+          button.type = 'button';
+
+          button.className =
+            'option' +
+            (
+              index === 0
+                ? ' selected'
+                : ''
+            );
+
+          button.textContent =
+            value;
+
+          if (index === 0) {
+            label.textContent =
+              value;
+
+            if (
+              type === 'category'
+            ) {
+              selectedCategory =
+                value;
+            } else {
+              selectedItem =
+                value;
+            }
+          }
+
+          button.addEventListener(
+            'click',
+            function(event) {
+              event.stopPropagation();
+
+              menu
+                .querySelectorAll(
+                  '.option'
+                )
+                .forEach(
+                  function(target) {
+                    target.classList.remove(
+                      'selected'
+                    );
+                  }
+                );
+
+              button.classList.add(
+                'selected'
+              );
+
+              label.textContent =
+                value;
+
+              if (
+                type === 'category'
+              ) {
+                selectedCategory =
+                  value;
+              } else {
+                selectedItem =
+                  value;
+              }
+
+              closeMenus();
+            }
+          );
+
+          menu.appendChild(button);
+        }
+      );
+    }
+
+    getElement('form')
+      .addEventListener(
+        'submit',
+        function(event) {
+          event.preventDefault();
+
+          const amount =
+            getElement('amount')
+              .value;
+
+          const memo =
+            getElement('memo')
+              .value;
+
+          if (!selectedCategory) {
+            showStatus(
+              'Please select a Category.',
+              'error'
+            );
+
+            return;
+          }
+
+          if (!selectedItem) {
+            showStatus(
+              'Please select an Item.',
+              'error'
+            );
+
+            return;
+          }
+
+          if (
+            !amount ||
+            Number(amount) <= 0
+          ) {
+            showStatus(
+              'Please enter an Amount.',
+              'error'
+            );
+
+            return;
+          }
+
+          const saveButton =
+            getElement('save');
+
+          saveButton.disabled =
+            true;
+
+          saveButton.textContent =
+            'Saving...';
+
+          showStatus(
+            'Saving...',
+            'info'
+          );
+
+          callApi(
+            'add',
+            {
+              category:
+                selectedCategory,
+
+              item:
+                selectedItem,
+
+              amount:
+                amount,
+
+              memo:
+                memo
+            }
+          )
+            .then(handleSaved)
+            .catch(handleError);
+        }
+      );
+
+    function handleSaved(data) {
+      showStatus(
+        'Saved.',
+        'success'
+      );
+
+      if (navigator.vibrate) {
+        navigator.vibrate(80);
+      }
+
+      const saved =
+        data.saved || {};
+
+      const last =
+        getElement('last');
+
+      last.className =
+        'last show';
+
+      last.textContent =
+        (saved.date || '') +
+        ' ' +
         (
-          index === 0
-            ? ' selected'
+          saved.category ||
+          'Card Payment'
+        ) +
+        ' ' +
+        (saved.item || '') +
+        ' ¥' +
+        Number(
+          saved.amount || 0
+        ).toLocaleString() +
+        (
+          saved.memo
+            ? ' ' + saved.memo
             : ''
         );
 
-      button.textContent =
-        value;
+      updateTotals(
+        data.totals || {}
+      );
 
-      if (index === 0) {
-        label.textContent =
-          value;
+      renderHistory(
+        data.history || []
+      );
 
-        if (
-          type === 'category'
-        ) {
-          selectedCategory =
-            value;
-        } else {
-          selectedItem =
-            value;
-        }
-      }
+      getElement('amount')
+        .value = '';
 
-      button.onclick =
-        function(event) {
-          event.stopPropagation();
-
-          menu
-            .querySelectorAll(
-              '.option'
-            )
-            .forEach(
-              function(target) {
-                target.classList.remove(
-                  'selected'
-                );
-              }
-            );
-
-          button.classList.add(
-            'selected'
-          );
-
-          label.textContent =
-            value;
-
-          if (
-            type === 'category'
-          ) {
-            selectedCategory =
-              value;
-          } else {
-            selectedItem =
-              value;
-          }
-
-          closeMenus();
-        };
-
-      menu.appendChild(button);
-    }
-  );
-}
-
-getElement('form')
-  .addEventListener(
-    'submit',
-    function(event) {
-      event.preventDefault();
-
-      const amount =
-        getElement('amount')
-          .value;
-
-      const memo =
-        getElement('memo')
-          .value;
-
-      if (!selectedCategory) {
-        showStatus(
-          'Please select a Category.',
-          'error'
-        );
-
-        return;
-      }
-
-      if (!selectedItem) {
-        showStatus(
-          'Please select an Item.',
-          'error'
-        );
-
-        return;
-      }
-
-      if (
-        !amount ||
-        Number(amount) <= 0
-      ) {
-        showStatus(
-          'Please enter an Amount.',
-          'error'
-        );
-
-        return;
-      }
+      getElement('memo')
+        .value = '';
 
       const saveButton =
         getElement('save');
 
       saveButton.disabled =
-        true;
+        false;
 
       saveButton.textContent =
-        'Saving...';
-
-      showStatus(
-        'Saving...',
-        'info'
-      );
-
-      callApi(
-        'add',
-        {
-          category:
-            selectedCategory,
-
-          item:
-            selectedItem,
-
-          amount:
-            amount,
-
-          memo:
-            memo
-        }
-      )
-        .then(handleSaved)
-        .catch(handleError);
+        'Save';
     }
-  );
 
-function handleSaved(data) {
-  showStatus(
-    'Saved.',
-    'success'
-  );
+    function updateTotals(data) {
+      data = data || {};
 
-  if (navigator.vibrate) {
-    navigator.vibrate(80);
-  }
+      getElement('foodBudget')
+        .textContent =
+          formatYen(
+            data.foodBudget
+          );
 
-  const saved =
-    data.saved || {};
+      getElement('foodTotal')
+        .textContent =
+          formatYen(
+            data.food
+          );
 
-  const last =
-    getElement('last');
+      getElement('dailyBudget')
+        .textContent =
+          formatYen(
+            data.dailyBudget
+          );
 
-  last.className =
-    'last show';
+      getElement('dailyTotal')
+        .textContent =
+          formatYen(
+            data.daily
+          );
 
-  last.textContent =
-    (saved.date || '') +
-    ' ' +
-    (
-      saved.category ||
-      'Card Payment'
-    ) +
-    ' ' +
-    (saved.item || '') +
-    ' ¥' +
-    Number(
-      saved.amount || 0
-    ).toLocaleString() +
-    (
-      saved.memo
-        ? ' ' + saved.memo
-        : ''
-    );
+      getElement('utilitiesBudget')
+        .textContent =
+          formatYen(
+            data.utilitiesBudget
+          );
 
-  updateTotals(
-    data.totals
-  );
+      getElement('utilitiesTotal')
+        .textContent =
+          formatYen(
+            data.utilities
+          );
 
-  renderHistory(
-    data.history
-  );
+      getElement('cardTotal')
+        .textContent =
+          formatYen(
+            data.card
+          );
+    }
 
-  getElement('amount')
-    .value = '';
+    function renderHistory(rows) {
+      rows = rows || [];
 
-  getElement('memo')
-    .value = '';
+      const list =
+        getElement('historyList');
 
-  const saveButton =
-    getElement('save');
+      list.innerHTML = '';
 
-  saveButton.disabled =
-    false;
-
-  saveButton.textContent =
-    'Save';
-}
-
-function updateTotals(data) {
-  data = data || {};
-
-  getElement('foodBudget')
-    .textContent =
-      'Budget ' +
-      formatYen(
-        data.foodBudget
-      );
-
-  getElement('foodTotal')
-    .textContent =
-      formatYen(
-        data.food
-      );
-
-  getElement('dailyBudget')
-    .textContent =
-      'Budget ' +
-      formatYen(
-        data.dailyBudget
-      );
-
-  getElement('dailyTotal')
-    .textContent =
-      formatYen(
-        data.daily
-      );
-
-  getElement('utilitiesBudget')
-    .textContent =
-      'Budget ' +
-      formatYen(
-        data.utilitiesBudget
-      );
-
-  getElement('utilitiesTotal')
-    .textContent =
-      formatYen(
-        data.utilities
-      );
-
-  getElement('cardTotal')
-    .textContent =
-      formatYen(
-        data.card
-      );
-}
-
-function renderHistory(rows) {
-  rows = rows || [];
-
-  const list =
-    getElement('historyList');
-
-  list.innerHTML = '';
-
-  if (!rows.length) {
-    list.innerHTML =
-      '<div class="empty">' +
-      'No history yet.' +
-      '</div>';
-
-    return;
-  }
-
-  rows.forEach(
-    function(row) {
-      const item =
-        document.createElement(
-          'div'
-        );
-
-      item.className =
-        'history-item';
-
-      const top =
-        document.createElement(
-          'div'
-        );
-
-      top.className =
-        'history-top';
-
-      const date =
-        document.createElement(
-          'div'
-        );
-
-      date.className =
-        'history-date';
-
-      date.textContent =
-        row.date || '';
-
-      const amount =
-        document.createElement(
-          'div'
-        );
-
-      amount.className =
-        'history-amount';
-
-      amount.textContent =
-        formatYen(row.amount);
-
-      top.appendChild(date);
-      top.appendChild(amount);
-
-      const main =
-        document.createElement(
-          'div'
-        );
-
-      main.className =
-        'history-main';
-
-      main.textContent =
-        (
-          row.category ||
-          'Card Payment'
-        ) +
-        ' · ' +
-        (row.item || '');
-
-      item.appendChild(top);
-      item.appendChild(main);
-
-      if (row.memo) {
-        const memo =
+      if (!rows.length) {
+        const empty =
           document.createElement(
             'div'
           );
 
-        memo.className =
-          'history-memo';
+        empty.className =
+          'empty';
 
-        memo.textContent =
-          row.memo;
+        empty.textContent =
+          'No history yet.';
 
-        item.appendChild(memo);
+        list.appendChild(empty);
+        return;
       }
 
-      list.appendChild(item);
+      rows.forEach(
+        function(row) {
+          const item =
+            document.createElement(
+              'div'
+            );
+
+          item.className =
+            'history-item';
+
+          const top =
+            document.createElement(
+              'div'
+            );
+
+          top.className =
+            'history-top';
+
+          const date =
+            document.createElement(
+              'div'
+            );
+
+          date.className =
+            'history-date';
+
+          date.textContent =
+            row.date || '';
+
+          const amount =
+            document.createElement(
+              'div'
+            );
+
+          amount.className =
+            'history-amount';
+
+          amount.textContent =
+            formatYen(
+              row.amount
+            );
+
+          top.appendChild(date);
+          top.appendChild(amount);
+
+          const main =
+            document.createElement(
+              'div'
+            );
+
+          main.className =
+            'history-main';
+
+          main.textContent =
+            (
+              row.category ||
+              'Card Payment'
+            ) +
+            ' · ' +
+            (row.item || '');
+
+          item.appendChild(top);
+          item.appendChild(main);
+
+          if (row.memo) {
+            const memo =
+              document.createElement(
+                'div'
+              );
+
+            memo.className =
+              'history-memo';
+
+            memo.textContent =
+              row.memo;
+
+            item.appendChild(memo);
+          }
+
+          list.appendChild(item);
+        }
+      );
     }
-  );
-}
 
-function formatYen(value) {
-  return (
-    '¥' +
-    Number(
-      value || 0
-    ).toLocaleString()
-  );
-}
+    function formatYen(value) {
+      return (
+        '¥' +
+        Number(
+          value || 0
+        ).toLocaleString()
+      );
+    }
 
-function showStatus(
-  message,
-  type
-) {
-  const status =
-    getElement('status');
+    function showStatus(
+      message,
+      type
+    ) {
+      const status =
+        getElement('status');
 
-  status.textContent =
-    message;
+      status.textContent =
+        message;
 
-  status.className =
-    'status show ' + type;
-}
+      status.className =
+        'status show ' + type;
+    }
 
-function hideStatus() {
-  const status =
-    getElement('status');
+    function hideStatus() {
+      const status =
+        getElement('status');
 
-  status.textContent = '';
-  status.className =
-    'status';
-}
+      status.textContent = '';
+      status.className =
+        'status';
+    }
 
-function handleError(error) {
-  getElement('loading')
-    .style.display = 'none';
+    function handleError(error) {
+      getElement('loading')
+        .style.display = 'none';
 
-  showStatus(
-    error.message ||
-      String(error),
-    'error'
-  );
+      showStatus(
+        error.message ||
+          String(error),
+        'error'
+      );
 
-  const saveButton =
-    getElement('save');
+      const saveButton =
+        getElement('save');
 
-  saveButton.disabled =
-    false;
+      saveButton.disabled =
+        false;
 
-  saveButton.textContent =
-    'Save';
-}
-</script>
+      saveButton.textContent =
+        'Save';
+    }
+  </script>
 </body>
 </html>
